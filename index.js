@@ -31,6 +31,11 @@
     }
   }
 
+  StorageBucketManager.prototype.open = async function open(name) {
+    const storageBucket = new StorageBucket(symbol, name)
+    return storageBucket
+  }
+
   StorageBucketManager.prototype.keys = async function keys() {
     const root = await navigator.storage.getDirectory()
     const file = await root.getFileHandle(MetaDataStorageKey, { create: true })
@@ -39,10 +44,17 @@
     return JSON.parse(list)
   }
 
-  const StorageBucket = function StorageBucket(sym) {
+  const StorageBucket = function StorageBucket(sym, name) {
     if (!Object.is(sym, symbol)) {
       throw new TypeError('Illegal constructor')
     }
+
+    Object.defineProperty(this, 'name', {
+      configurable: true,
+      enumerable: true,
+      get: () => name,
+      set: undefined,
+    })
   }
 
   const storageBuckets = new StorageBucketManager()
