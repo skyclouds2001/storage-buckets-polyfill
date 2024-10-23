@@ -17,12 +17,20 @@
 
   const symbol = Symbol()
 
-  const metaDataStorageKey = 'storage-buckets-polyfill'
+  const MetaDataStorageKey = 'storage-buckets-polyfill'
 
   const StorageBucketManager = function StorageBucketManager(sym) {
     if (!Object.is(sym, symbol)) {
       throw new TypeError('Illegal constructor')
     }
+  }
+
+  StorageBucketManager.prototype.keys = async function keys() {
+    const root = await navigator.storage.getDirectory()
+    const file = await root.getFileHandle(MetaDataStorageKey, { create: true })
+    const data = await file.getFile()
+    const list = await data.text()
+    return JSON.parse(list)
   }
 
   const StorageBucket = function StorageBucket(sym) {
