@@ -9,6 +9,12 @@
     throw new TypeError('Invalid calling environment')
   }
 
+  const isInSecureContext = global.isSecureContext
+
+  if (!isInSecureContext) {
+    return
+  }
+
   const isBuiltinSupported = typeof StorageBucketManager !== 'undefined' && typeof StorageBucket !== 'undefined'
 
   if (isBuiltinSupported) {
