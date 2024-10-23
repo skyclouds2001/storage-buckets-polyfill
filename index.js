@@ -95,6 +95,51 @@
     writable: true,
   })
 
+  const $delete = async function (name) {
+    try {
+      const root = await global.navigator.storage.getDirectory()
+      const file = await root.getFileHandle(MetaDataStorageKey)
+      const data = await file.getFile()
+      const list = await data.text()
+      const entries = JSON.parse(list)
+      const entry = entries[name]
+      if (entry == null) {
+        return
+      }
+
+      const { indexdb, cache, opfs } = entry
+      indexdb.forEach((el) => {
+        global.indexedDB.deleteDatabase(MetaDataStorageKey + name + el)
+      })
+      cache.forEach((el) => {
+        global.caches.delete(MetaDataStorageKey + name + el)
+      })
+      opfs.forEach((el) => {
+        root.removeEntry(MetaDataStorageKey + name + el)
+      })
+    } catch (error) {
+      if (error instanceof DOMException && error.code === DOMException.NOT_SUPPORTED_ERR) {
+        return
+      } else {
+        throw error
+      }
+    }
+  }
+
+  Object.defineProperty($delete, 'name', {
+    configurable: true,
+    enumerable: false,
+    value: 'delete',
+    writable: false,
+  })
+
+  Object.defineProperty(StorageBucketManager.prototype, 'delete', {
+    configurable: true,
+    enumerable: true,
+    value: $delete,
+    writable: true,
+  })
+
   const StorageBucket = function StorageBucket(sym, name) {
     if (!Object.is(sym, symbol)) {
       throw new TypeError('Illegal constructor')
