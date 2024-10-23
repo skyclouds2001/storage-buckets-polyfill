@@ -46,6 +46,21 @@
   })
 
   const $open = async function (name) {
+    try {
+      const root = await global.navigator.storage.getDirectory()
+      await root.getFileHandle(MetaDataStorageKey)
+    } catch (error) {
+      if (error instanceof DOMException && error.code === DOMException.NOT_SUPPORTED_ERR) {
+        const root = await global.navigator.storage.getDirectory()
+        const file = await root.getFileHandle(MetaDataStorageKey, { create: true })
+        const writable = await file.createWritable()
+        const data = JSON.stringify({})
+        await writable.write(data)
+        await writable.close()
+      } else {
+        throw error
+      }
+    }
     const storageBucket = new StorageBucket(symbol, name)
     return storageBucket
   }
