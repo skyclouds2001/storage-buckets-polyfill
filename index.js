@@ -31,6 +31,13 @@
     }
   }
 
+  Object.defineProperty(StorageBucketManager.prototype, Symbol.toStringTag, {
+    configurable: true,
+    enumerable: false,
+    value: 'StorageBucketManager',
+    writable: false,
+  })
+
   const open = async function(name) {
     const storageBucket = new StorageBucket(symbol, name)
     return storageBucket
@@ -70,6 +77,13 @@
       set: undefined,
     })
   }
+
+  Object.defineProperty(StorageBucket.prototype, Symbol.toStringTag, {
+    configurable: true,
+    enumerable: false,
+    value: 'StorageBucket',
+    writable: false,
+  })
 
   const storageBuckets = new StorageBucketManager()
 
