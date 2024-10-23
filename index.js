@@ -38,7 +38,7 @@
     writable: false,
   })
 
-  const open = async function(name) {
+  const open = async function (name) {
     const storageBucket = new StorageBucket(symbol, name)
     return storageBucket
   }
@@ -50,12 +50,21 @@
     writable: true,
   })
 
-  const keys = async function() {
-    const root = await navigator.storage.getDirectory()
-    const file = await root.getFileHandle(MetaDataStorageKey, { create: true })
-    const data = await file.getFile()
-    const list = await data.text()
-    return JSON.parse(list)
+  const keys = async function () {
+    try {
+      const root = await global.navigator.storage.getDirectory()
+      const file = await root.getFileHandle(MetaDataStorageKey)
+      const data = await file.getFile()
+      const list = await data.text()
+      const keys = Object.keys(JSON.parse(list))
+      return keys
+    } catch (error) {
+      if (error instanceof DOMException && error.code === DOMException.NOT_SUPPORTED_ERR) {
+        return []
+      } else {
+        throw error
+      }
+    }
   }
 
   Object.defineProperty(StorageBucketManager.prototype, 'keys', {
