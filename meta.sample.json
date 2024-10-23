@@ -1,0 +1,11 @@
+{
+  "sample": {
+    "name": "sample",
+    "persisted": "",
+    "quota": 0,
+    "expires": 0,
+    "indexdb": ["sample"],
+    "cache": ["sample"],
+    "opfs": ["sample"]
+  }
+}
