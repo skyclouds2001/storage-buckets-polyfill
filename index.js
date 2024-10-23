@@ -31,6 +31,13 @@
     }
   }
 
+  Object.defineProperty(global, 'StorageBucketManager', {
+    configurable: true,
+    enumerable: false,
+    value: StorageBucketManager,
+    writable: true,
+  })
+
   Object.defineProperty(StorageBucketManager.prototype, Symbol.toStringTag, {
     configurable: true,
     enumerable: false,
@@ -43,18 +50,18 @@
     return storageBucket
   }
 
-  Object.defineProperty($open, 'name', {
-    configurable: true,
-    enumerable: true,
-    value: 'open',
-    writable: true,
-  })
-
   Object.defineProperty(StorageBucketManager.prototype, 'open', {
     configurable: true,
     enumerable: false,
     value: $open,
     writable: false,
+  })
+
+  Object.defineProperty($open, 'name', {
+    configurable: true,
+    enumerable: true,
+    value: 'open',
+    writable: true,
   })
 
   const $keys = async function () {
@@ -101,6 +108,13 @@
     })
   }
 
+  Object.defineProperty(global, 'StorageBucket', {
+    configurable: true,
+    enumerable: false,
+    value: StorageBucket,
+    writable: true,
+  })
+
   Object.defineProperty(StorageBucket.prototype, Symbol.toStringTag, {
     configurable: true,
     enumerable: false,
@@ -109,20 +123,6 @@
   })
 
   const storageBuckets = new StorageBucketManager()
-
-  Object.defineProperty(global, 'StorageBucketManager', {
-    configurable: true,
-    enumerable: false,
-    value: StorageBucketManager,
-    writable: true,
-  })
-
-  Object.defineProperty(global, 'StorageBucket', {
-    configurable: true,
-    enumerable: false,
-    value: StorageBucket,
-    writable: true,
-  })
 
   Object.defineProperty(Object.getPrototypeOf(global.navigator), 'storageBuckets', {
     configurable: true,
