@@ -38,19 +38,26 @@
     writable: false,
   })
 
-  const open = async function (name) {
+  const $open = async function (name) {
     const storageBucket = new StorageBucket(symbol, name)
     return storageBucket
   }
 
-  Object.defineProperty(StorageBucketManager.prototype, 'open', {
+  Object.defineProperty($open, 'name', {
     configurable: true,
     enumerable: true,
-    value: open,
+    value: 'open',
     writable: true,
   })
 
-  const keys = async function () {
+  Object.defineProperty(StorageBucketManager.prototype, 'open', {
+    configurable: true,
+    enumerable: false,
+    value: $open,
+    writable: false,
+  })
+
+  const $keys = async function () {
     try {
       const root = await global.navigator.storage.getDirectory()
       const file = await root.getFileHandle(MetaDataStorageKey)
@@ -67,10 +74,17 @@
     }
   }
 
+  Object.defineProperty($keys, 'name', {
+    configurable: true,
+    enumerable: false,
+    value: 'keys',
+    writable: false,
+  })
+
   Object.defineProperty(StorageBucketManager.prototype, 'keys', {
     configurable: true,
     enumerable: true,
-    value: keys,
+    value: $keys,
     writable: true,
   })
 
