@@ -31,18 +31,32 @@
     }
   }
 
-  StorageBucketManager.prototype.open = async function open(name) {
+  const open = async function(name) {
     const storageBucket = new StorageBucket(symbol, name)
     return storageBucket
   }
 
-  StorageBucketManager.prototype.keys = async function keys() {
+  Object.defineProperty(StorageBucketManager.prototype, 'open', {
+    configurable: true,
+    enumerable: true,
+    value: open,
+    writable: true,
+  })
+
+  const keys = async function() {
     const root = await navigator.storage.getDirectory()
     const file = await root.getFileHandle(MetaDataStorageKey, { create: true })
     const data = await file.getFile()
     const list = await data.text()
     return JSON.parse(list)
   }
+
+  Object.defineProperty(StorageBucketManager.prototype, 'keys', {
+    configurable: true,
+    enumerable: true,
+    value: keys,
+    writable: true,
+  })
 
   const StorageBucket = function StorageBucket(sym, name) {
     if (!Object.is(sym, symbol)) {
