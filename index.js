@@ -168,10 +168,36 @@
       throw new TypeError('Illegal constructor')
     }
 
+    const $name = name
+
     Object.defineProperty(this, 'name', {
       configurable: true,
       enumerable: true,
-      get: () => name,
+      get: () => $name,
+      set: undefined,
+    })
+
+    const searchReg = new RegExp('^' + MetaDataStorageKey + $name)
+
+    const $indexedDB = new Proxy(global.indexedDB, {
+      get: (target, p, receiver) => {
+        switch (p) {
+          case 'cmp':
+            return (first, second) => Reflect.get(target, 'cmp', receiver)(first, second)
+          case 'databases':
+            return () => Reflect.get(target, 'databases', receiver)().then((databases) => databases.filter((database) => database.startsWith(MetaDataStorageKey + $name)).map(({ name, version }) => ({ name: name.replace(searchReg, ''), version })))
+          case 'deleteDatabase':
+            return (name) => Reflect.get(target, 'deleteDatabase', receiver)(MetaDataStorageKey + $name + name)
+          case 'open':
+            return (name, version) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + name, version)
+        }
+      },
+    })
+
+    Object.defineProperty(this, 'indexedDB', {
+      configurable: true,
+      enumerable: true,
+      get: () => $indexedDB,
       set: undefined,
     })
   }
