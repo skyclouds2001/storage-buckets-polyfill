@@ -200,6 +200,30 @@
       get: () => $indexedDB,
       set: undefined,
     })
+
+    const $caches = new Proxy(global.caches, {
+      get: (target, p, receiver) => {
+        switch (p) {
+          case 'delete':
+            return (cacheName) => Reflect.get(target, 'delete', receiver)(MetaDataStorageKey + $name + cacheName)
+          case 'has':
+            return (cacheName) => Reflect.get(target, 'has', receiver)(MetaDataStorageKey + $name + cacheName)
+          case 'keys':
+            return () => Reflect.get(target, 'keys', receiver)().then((keys) => keys.map(key => key.replace(searchReg, '')))
+          case 'match':
+            return (request, options) => Reflect.get(target, 'match', receiver)(request, options)
+          case 'open':
+            return (cacheName) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + cacheName)
+        }
+      },
+    })
+
+    Object.defineProperty(this, 'caches', {
+      configurable: true,
+      enumerable: true,
+      get: () => $caches,
+      set: undefined,
+    })
   }
 
   Object.defineProperty($StorageBucket, 'name', {
