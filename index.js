@@ -74,9 +74,9 @@
 
   Object.defineProperty($open, 'name', {
     configurable: true,
-    enumerable: true,
+    enumerable: false,
     value: 'open',
-    writable: true,
+    writable: false,
   })
 
   Object.defineProperty($StorageBucketManager.prototype, 'open', {
