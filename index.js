@@ -5,19 +5,19 @@
 
   const isInSupportedPlatform = isInWindow || isInWorker
 
-  if (!isInSupportedPlatform) {
+  if (!global.STORAGE_BUCKETS_POLYFILL_DISABLE_SUPPORTED_PLATFORM_CHECK && !isInSupportedPlatform) {
     throw new TypeError('Invalid calling environment')
   }
 
   const isInSecureContext = global.isSecureContext
 
-  if (!isInSecureContext) {
+  if (!global.STORAGE_BUCKETS_POLYFILL_DISABLE_SECURE_CONTEXT_CHECK && !isInSecureContext) {
     return
   }
 
   const isBuiltinSupported = typeof StorageBucketManager !== 'undefined' && typeof StorageBucket !== 'undefined'
 
-  if (isBuiltinSupported) {
+  if (!global.STORAGE_BUCKETS_POLYFILL_DISABLE_BUILTIN_CHECK && isBuiltinSupported) {
     return
   }
 
