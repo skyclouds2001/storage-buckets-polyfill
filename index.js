@@ -253,7 +253,12 @@
     Object.defineProperty(Navigator.prototype, 'storageBuckets', {
       configurable: true,
       enumerable: true,
-      get: () => storageBuckets,
+      get: function () {
+        if (this !== global.navigator) {
+          throw new TypeError('Illegal invocation')
+        }
+        return storageBuckets
+      },
       set: undefined,
     })
   }
@@ -261,7 +266,12 @@
     Object.defineProperty(WorkerNavigator.prototype, 'storageBuckets', {
       configurable: true,
       enumerable: true,
-      get: () => storageBuckets,
+      get: function () {
+        if (this !== global.navigator) {
+          throw new TypeError('Illegal invocation')
+        }
+        return storageBuckets
+      },
       set: undefined,
     })
   }
