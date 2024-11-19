@@ -34,6 +34,8 @@ const expect = (result) => {
   }
 }
 
+const expectAsync = async (result) => expect(await result)
+
 result.textContent = 'Test Running...'
 
 try {
@@ -122,6 +124,40 @@ try {
     expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager, 'name').writable).toBe(false)
     expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager, 'name').enumerable).toBe(false)
     expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager, 'name').configurable).toBe(true)
+
+    /**
+     * StorageBucketManager's function members must throw if not call as StorageBucketManager's member
+     */
+    const fn = globalThis.StorageBucketManager.prototype[sbm]
+    void (await expectAsync(() => fn('sample'))).toBeThrown()
+  }
+
+  /**
+   * clean up storage buckets for feature test
+   */
+  for (const key of await navigator.storageBuckets.keys()) {
+    await navigator.storageBuckets.delete(key)
+  }
+
+  /**
+   * StorageBucketManager should be able to enum storage buckets, open storage buckets and delete storage buckets
+   */
+  expect((await navigator.storageBuckets.keys()).length).toBe(0)
+  expect(await navigator.storageBuckets.open('sample')).toBeDefined()
+  expect((await navigator.storageBuckets.keys()).length).toBe(1)
+  expect(await navigator.storageBuckets.delete('sample')).toBeUndefined()
+
+  /**
+   * StorageBucketManager should throw if open storage buckets and delete storage buckets without parameters
+   */
+  void (await expectAsync(() => navigator.storageBuckets.open())).toBeThrown()
+  void (await expectAsync(() => navigator.storageBuckets.delete())).toBeThrown()
+
+  /**
+   * clean up storage buckets for feature test
+   */
+  for (const key of await navigator.storageBuckets.keys()) {
+    await navigator.storageBuckets.delete(key)
   }
 
   result.textContent = 'Test Succeeded!'
