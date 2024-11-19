@@ -145,7 +145,7 @@
   const $delete = async function (name) {
     try {
       if (arguments.length === 0) {
-        throw new TypeError('Failed to execute \'open\' on \'StorageBucketManager\': 1 argument required, but only 0 present.')
+        throw new TypeError('Failed to execute \'delete\' on \'StorageBucketManager\': 1 argument required, but only 0 present.')
       }
 
       const entries = await $readEntries()
