@@ -25,6 +25,24 @@
 
   const MetaDataStorageKey = 'storage-buckets-polyfill'
 
+  const $readEntries = async () => {
+    const rootHandle = await global.navigator.storage.getDirectory()
+    const fileHandle = await rootHandle.getFileHandle(MetaDataStorageKey)
+    const file = await fileHandle.getFile()
+    const data = await file.text()
+    const entries = JSON.parse(data)
+    return entries
+  }
+
+  const $writeEntries = async (data) => {
+    const rootHandle = await global.navigator.storage.getDirectory()
+    const fileHandle = await rootHandle.getFileHandle(MetaDataStorageKey, { create: true })
+    const writableStream = await fileHandle.createWritable({ keepExistingData: false })
+    const data = JSON.stringify(data)
+    await writableStream.write(data)
+    await writableStream.close()
+  }
+
   const $StorageBucketManager = function StorageBucketManager(sym) {
     if (!Object.is(sym, symbol)) {
       throw new TypeError('Illegal constructor')
@@ -54,16 +72,21 @@
 
   const $open = async function (name) {
     try {
-      const rootHandle = await global.navigator.storage.getDirectory()
-      await rootHandle.getFileHandle(MetaDataStorageKey)
+      const entries = await $readEntries()
+      if (entries[name] == null) {
+        entries[name] = {
+          name,
+        }
+        await $writeEntries(entries)
+      }
     } catch (error) {
-      if (error instanceof DOMException && error.code === DOMException.NOT_FOUND_ERR) {
-        const rootHandle = await global.navigator.storage.getDirectory()
-        const fileHandle = await rootHandle.getFileHandle(MetaDataStorageKey, { create: true })
-        const writableStream = await fileHandle.createWritable()
-        const data = JSON.stringify({})
-        await writableStream.write(data)
-        await writableStream.close()
+      if (error instanceof DOMException && error.name === 'NotFoundError') {
+        const entries = {
+          [name]: {
+            name,
+          },
+        }
+        await $writeEntries(entries)
       } else {
         throw error
       }
