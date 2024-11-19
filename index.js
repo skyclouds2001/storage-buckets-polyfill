@@ -72,6 +72,10 @@
 
   const $open = async function (name) {
     try {
+      if (Object.getPrototypeOf(this) !== $StorageBucketManager.prototype) {
+        throw new TypeError('Failed to execute \'open\' on \'StorageBucketManager\': Illegal invocation')
+      }
+
       if (arguments.length === 0) {
         throw new TypeError('Failed to execute \'open\' on \'StorageBucketManager\': 1 argument required, but only 0 present.')
       }
@@ -115,6 +119,10 @@
 
   const $keys = async function () {
     try {
+      if (Object.getPrototypeOf(this) !== $StorageBucketManager.prototype) {
+        throw new TypeError('Failed to execute \'keys\' on \'StorageBucketManager\': Illegal invocation')
+      }
+
       const entries = await $readEntries()
       const keys = Object.keys(entries)
       return keys
@@ -144,6 +152,10 @@
 
   const $delete = async function (name) {
     try {
+      if (Object.getPrototypeOf(this) !== $StorageBucketManager.prototype) {
+        throw new TypeError('Failed to execute \'delete\' on \'StorageBucketManager\': Illegal invocation')
+      }
+
       if (arguments.length === 0) {
         throw new TypeError('Failed to execute \'delete\' on \'StorageBucketManager\': 1 argument required, but only 0 present.')
       }
