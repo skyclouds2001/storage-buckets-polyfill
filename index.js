@@ -111,16 +111,13 @@
 
   const $keys = async function () {
     try {
-      const rootHandle = await global.navigator.storage.getDirectory()
-      const fileHandle = await rootHandle.getFileHandle(MetaDataStorageKey)
-      const file = await fileHandle.getFile()
-      const data = await file.text()
-      const entries = JSON.parse(data)
+      const entries = await $readEntries()
       const keys = Object.keys(entries)
       return keys
     } catch (error) {
-      if (error instanceof DOMException && error.code === DOMException.NOT_FOUND_ERR) {
-        return []
+      if (error instanceof DOMException && error.name === 'NotFoundError') {
+        const keys = []
+        return keys
       } else {
         throw error
       }
@@ -164,7 +161,7 @@
         rootHandle.removeEntry(MetaDataStorageKey + name + el)
       })
     } catch (error) {
-      if (error instanceof DOMException && error.code === DOMException.NOT_FOUND_ERR) {
+      if (error instanceof DOMException && error.name === 'NotFoundError') {
         return
       } else {
         throw error
