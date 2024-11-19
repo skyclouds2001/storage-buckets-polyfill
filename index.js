@@ -140,11 +140,7 @@
 
   const $delete = async function (name) {
     try {
-      const rootHandle = await global.navigator.storage.getDirectory()
-      const fileHandle = await rootHandle.getFileHandle(MetaDataStorageKey)
-      const file = await fileHandle.getFile()
-      const data = await file.text()
-      const entries = JSON.parse(data)
+      const entries = $readEntries()
       const entry = entries[name]
       if (entry == null) {
         return
