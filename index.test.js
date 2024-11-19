@@ -19,10 +19,10 @@ const expect = (result) => {
     }
   }
 
-  const toBeThrown = () => {
+  const toThrow = () => {
     try {
       result()
-      throw 'Expected to thrown'
+      throw 'Expected to throw'
     } catch { }
   }
 
@@ -30,11 +30,9 @@ const expect = (result) => {
     toBe,
     toBeDefined,
     toBeUndefined,
-    toBeThrown,
+    toThrow,
   }
 }
-
-const expectAsync = async (result) => expect(await result)
 
 result.textContent = 'Test Running...'
 
@@ -90,8 +88,8 @@ try {
   /**
    * calling StorageBucketManager & StorageBucket must throw
    */
-  expect(() => new globalThis.StorageBucketManager()).toBeThrown()
-  expect(() => new globalThis.StorageBucket()).toBeThrown()
+  expect(() => new globalThis.StorageBucketManager()).toThrow()
+  expect(() => new globalThis.StorageBucket()).toThrow()
 
   /**
    * Navigator.prototype must be specified `storageBuckets` property
@@ -105,22 +103,21 @@ try {
    * access `storageBuckets` property via Navigator.prototype must throw, via navigator must not throw
    */
   expect(navigator.storageBuckets).toBeDefined()
-  expect(() => Navigator.prototype.storageBuckets).toBeThrown()
+  expect(() => Navigator.prototype.storageBuckets).toThrow()
 
-  const sbmsm = ['open', 'keys', 'delete']
-  for (const sbm of sbmsm) {
+  for (const key of ['open', 'keys', 'delete']) {
     /**
      * StorageBucketManager's function members must be defined, writable, enumerable and configurable
      */
-    expect(globalThis.StorageBucketManager.prototype[sbm]).toBeDefined()
-    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager.prototype, sbm).writable).toBe(true)
-    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager.prototype, sbm).enumerable).toBe(true)
-    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager.prototype, sbm).configurable).toBe(true)
+    expect(globalThis.StorageBucketManager.prototype[key]).toBeDefined()
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager.prototype, key).writable).toBe(true)
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager.prototype, key).enumerable).toBe(true)
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager.prototype, key).configurable).toBe(true)
 
     /**
      * StorageBucketManager's function members must have `name` property and should be equal to the member's name, which should be configurable, not writable and not enumerable
      */
-    expect(globalThis.StorageBucketManager.prototype[sbm].name).toBe(sbm)
+    expect(globalThis.StorageBucketManager.prototype[key].name).toBe(key)
     expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager, 'name').writable).toBe(false)
     expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager, 'name').enumerable).toBe(false)
     expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager, 'name').configurable).toBe(true)
@@ -128,8 +125,11 @@ try {
     /**
      * StorageBucketManager's function members must throw if not call as StorageBucketManager's member
      */
-    const fn = globalThis.StorageBucketManager.prototype[sbm]
-    void (await expectAsync(() => fn('sample'))).toBeThrown()
+    const fn = globalThis.StorageBucketManager.prototype[key]
+    try {
+      await fn('sample')
+      throw 'Expected to throw'
+    } catch { }
   }
 
   /**
@@ -148,10 +148,16 @@ try {
   expect(await navigator.storageBuckets.delete('sample')).toBeUndefined()
 
   /**
-   * StorageBucketManager should throw if open storage buckets and delete storage buckets without parameters
+   * StorageBucketManager should throw if open storage buckets and delete storage buckets without name parameters
    */
-  void (await expectAsync(() => navigator.storageBuckets.open())).toBeThrown()
-  void (await expectAsync(() => navigator.storageBuckets.delete())).toBeThrown()
+    try {
+      await navigator.storageBuckets.open()
+      throw 'Expected to throw'
+    } catch { }
+    try {
+      await navigator.storageBuckets.delete()
+      throw 'Expected to throw'
+    } catch { }
 
   /**
    * clean up storage buckets for feature test
