@@ -81,9 +81,9 @@
 
   Object.defineProperty($StorageBucketManager.prototype, 'open', {
     configurable: true,
-    enumerable: false,
+    enumerable: true,
     value: $open,
-    writable: false,
+    writable: true,
   })
 
   const $keys = async function () {
