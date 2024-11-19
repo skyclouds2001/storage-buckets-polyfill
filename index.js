@@ -249,10 +249,20 @@
 
   const storageBuckets = new $StorageBucketManager(symbol)
 
-  Object.defineProperty(Object.getPrototypeOf(global.navigator), 'storageBuckets', {
-    configurable: true,
-    enumerable: true,
-    get: () => storageBuckets,
-    set: undefined,
-  })
+  if (isInWindow) {
+    Object.defineProperty(Navigator.prototype, 'storageBuckets', {
+      configurable: true,
+      enumerable: true,
+      get: () => storageBuckets,
+      set: undefined,
+    })
+  }
+  if (isInWorker) {
+    Object.defineProperty(WorkerNavigator.prototype, 'storageBuckets', {
+      configurable: true,
+      enumerable: true,
+      get: () => storageBuckets,
+      set: undefined,
+    })
+  }
 })(globalThis)
