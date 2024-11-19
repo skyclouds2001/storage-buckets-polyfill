@@ -34,11 +34,11 @@
     return entries
   }
 
-  const $writeEntries = async (data) => {
+  const $writeEntries = async (entries) => {
     const rootHandle = await global.navigator.storage.getDirectory()
     const fileHandle = await rootHandle.getFileHandle(MetaDataStorageKey, { create: true })
     const writableStream = await fileHandle.createWritable({ keepExistingData: false })
-    const data = JSON.stringify(data)
+    const data = JSON.stringify(entries)
     await writableStream.write(data)
     await writableStream.close()
   }
