@@ -15,7 +15,7 @@
     return
   }
 
-  const isBuiltinSupported = typeof $StorageBucketManager !== 'undefined' && typeof $StorageBucket !== 'undefined'
+  const isBuiltinSupported = typeof StorageBucketManager !== 'undefined' && typeof StorageBucket !== 'undefined'
 
   if (isBuiltinSupported) {
     return
