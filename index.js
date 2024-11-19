@@ -148,22 +148,25 @@
         throw new TypeError('Failed to execute \'open\' on \'StorageBucketManager\': 1 argument required, but only 0 present.')
       }
 
-      const entries = $readEntries()
+      const entries = await $readEntries()
       const entry = entries[name]
       if (entry == null) {
         return
       }
 
-      const { indexdb, cache, opfs } = entry
-      indexdb.forEach((el) => {
-        global.indexedDB.deleteDatabase(MetaDataStorageKey + name + el)
-      })
-      cache.forEach((el) => {
-        global.caches.delete(MetaDataStorageKey + name + el)
-      })
-      opfs.forEach((el) => {
-        rootHandle.removeEntry(MetaDataStorageKey + name + el)
-      })
+      // const { indexdb, cache, opfs } = entry
+      // indexdb.forEach((el) => {
+      //   global.indexedDB.deleteDatabase(MetaDataStorageKey + name + el)
+      // })
+      // cache.forEach((el) => {
+      //   global.caches.delete(MetaDataStorageKey + name + el)
+      // })
+      // opfs.forEach((el) => {
+      //   rootHandle.removeEntry(MetaDataStorageKey + name + el)
+      // })
+
+      delete entries[name]
+      await $writeEntries(entries)
     } catch (error) {
       if (error instanceof DOMException && error.name === 'NotFoundError') {
         return
