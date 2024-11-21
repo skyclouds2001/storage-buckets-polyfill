@@ -314,7 +314,7 @@
           case 'keys':
             return () => Reflect.get(target, 'keys', receiver).call(target).then((keys) => keys.map(key => key.replace(searchReg, '')))
           case 'match':
-            return (request, options) => Reflect.get(target, 'match', receiver).call(target)(request, options)
+            return (request, options) => Reflect.get(target, 'match', receiver).call(target, request, options)
           case 'open':
             return (cacheName) => Reflect.get(target, 'open', receiver).call(target, MetaDataStorageKey + $name + cacheName)
         }
