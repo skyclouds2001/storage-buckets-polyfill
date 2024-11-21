@@ -57,6 +57,7 @@
     await writableStream.close()
   }
 
+  /** @type {StorageBucketManager} */
   const $StorageBucketManager = function StorageBucketManager() {
     if (!allowConstruct) {
       throw new TypeError('Illegal constructor')
@@ -84,6 +85,7 @@
     writable: true,
   })
 
+  /** @type {StorageBucketManager['open']} */
   const $open = async function (name) {
     try {
       if (Object.getPrototypeOf(this) !== $StorageBucketManager.prototype) {
@@ -134,6 +136,7 @@
     writable: true,
   })
 
+  /** @type {StorageBucketManager['keys']} */
   const $keys = async function () {
     try {
       if (Object.getPrototypeOf(this) !== $StorageBucketManager.prototype) {
@@ -167,6 +170,7 @@
     writable: true,
   })
 
+  /** @type {StorageBucketManager['delete']} */
   const $delete = async function (name) {
     try {
       if (Object.getPrototypeOf(this) !== $StorageBucketManager.prototype) {
@@ -221,6 +225,7 @@
 
   const $$name = Symbol()
 
+  /** @type {StorageBucket} */
   const $StorageBucket = function StorageBucket(name) {
     if (!allowConstruct) {
       throw new TypeError('Illegal constructor')
@@ -250,6 +255,7 @@
     writable: true,
   })
 
+  /** @type {() => StorageBucket['name']} */
   const $name = function () {
     if (Object.getPrototypeOf(this) !== $StorageBucket.prototype) {
       throw new TypeError('Illegal invocation')
@@ -265,6 +271,7 @@
     set: undefined,
   })
 
+  /** @type {() => StorageBucket['indexedDB']} */
   const $indexedDB = function () {
     const searchReg = new RegExp('^' + MetaDataStorageKey + this[$$name])
 
@@ -291,6 +298,7 @@
     set: undefined,
   })
 
+  /** @type {() => StorageBucket['caches']} */
   const $caches = function () {
     return new Proxy(global.caches, {
       get: (target, p, receiver) => {
