@@ -25,6 +25,20 @@
 
   const MetaDataStorageKey = 'storage-buckets-polyfill'
 
+  const $createEntry = async ({
+    name,
+  }) => {
+    return {
+      name,
+      // persisted: false,
+      // quota: 0,
+      // expires: 0,
+      // indexdb: [],
+      // cache: [],
+      // opfs: [],
+    }
+  }
+
   const $readEntries = async () => {
     const rootHandle = await global.navigator.storage.getDirectory()
     const fileHandle = await rootHandle.getFileHandle(MetaDataStorageKey)
@@ -82,18 +96,18 @@
 
       const entries = await $readEntries()
       if (entries[name] == null) {
-        entries[name] = {
+        entries[name] = $createEntry({
           name,
-        }
+        })
         await $writeEntries(entries)
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === 'NotFoundError') {
-        const entries = {
-          [name]: {
-            name,
-          },
-        }
+        const entries = {}
+        entries[name] = $createEntry({
+          name,
+        }),
+
         await $writeEntries(entries)
       } else {
         throw error
