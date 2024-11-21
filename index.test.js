@@ -38,7 +38,7 @@ result.textContent = 'Test Running...'
 
 try {
   /**
-   * StorageBucketManager & StorageBucket must be defined
+   * StorageBucketManager & StorageBucket must be defined, which must be defined, writable, not enumerable and configurable
    */
   expect(globalThis.StorageBucketManager).toBeDefined()
   expect(Object.getOwnPropertyDescriptor(globalThis, 'StorageBucketManager').writable).toBe(true)
@@ -50,7 +50,7 @@ try {
   expect(Object.getOwnPropertyDescriptor(globalThis, 'StorageBucket').configurable).toBe(true)
 
   /**
-   * StorageBucketManager & StorageBucket must be specified `name` property
+   * StorageBucketManager & StorageBucket must be specified `name` property, which must be defined, not writable, not enumerable and configurable
    */
   expect(globalThis.StorageBucketManager.name).toBe('StorageBucketManager')
   expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager, 'name').writable).toBe(false)
@@ -62,7 +62,7 @@ try {
   expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket, 'name').configurable).toBe(true)
 
   /**
-   * StorageBucketManager.prototype & StorageBucket.prototype must be specified `Symbol.toStringTag` property
+   * StorageBucketManager.prototype & StorageBucket.prototype must be specified `Symbol.toStringTag` property, which must be defined, not writable, not enumerable and configurable
    */
   expect(globalThis.StorageBucketManager.prototype[Symbol.toStringTag]).toBe('StorageBucketManager')
   expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager.prototype, Symbol.toStringTag).writable).toBe(false)
@@ -74,7 +74,7 @@ try {
   expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket.prototype, Symbol.toStringTag).configurable).toBe(true)
 
   /**
-   * StorageBucketManager.prototype & StorageBucket.prototype must be specified `constructor` property and must be equal to StorageBucketManager & StorageBucket
+   * StorageBucketManager.prototype & StorageBucket.prototype must be specified `constructor` property and must be equal to StorageBucketManager & StorageBucket, which must be defined, writable, not enumerable and configurable
    */
   expect(globalThis.StorageBucketManager.prototype.constructor).toBe(globalThis.StorageBucketManager)
   expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucketManager.prototype, 'constructor').writable).toBe(true)
@@ -92,7 +92,7 @@ try {
   expect(() => new globalThis.StorageBucket()).toThrow()
 
   /**
-   * Navigator.prototype must be specified `storageBuckets` property
+   * Navigator.prototype must be specified `storageBuckets` property, which must has getter but without setter, enumerable and configurable
    */
   expect(Object.getOwnPropertyDescriptor(Navigator.prototype, 'storageBuckets').get).toBeDefined()
   expect(Object.getOwnPropertyDescriptor(Navigator.prototype, 'storageBuckets').set).toBeUndefined()
@@ -164,6 +164,13 @@ try {
     throw 'Expected to throw'
   } catch { }
 
+  /**
+   * clean up storage buckets after feature test
+   */
+  for (const key of await navigator.storageBuckets.keys()) {
+    await navigator.storageBuckets.delete(key)
+  }
+
   for (const key of ['name']) {
     /**
      * StorageBucket's property members must throw if not call as StorageBucket's member
@@ -210,7 +217,7 @@ try {
   }
 
   /**
-   * create storage bucket after feature test
+   * create storage bucket before feature test
    */
   const storageBucket = await navigator.storageBuckets.open('sample')
 
@@ -224,13 +231,6 @@ try {
    * delete storage bucket after feature test
    */
   await navigator.storageBuckets.delete('sample')
-
-  /**
-   * clean up storage buckets after feature test
-   */
-  for (const key of await navigator.storageBuckets.keys()) {
-    await navigator.storageBuckets.delete(key)
-  }
 
   result.textContent = 'Test Succeeded!'
 
