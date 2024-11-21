@@ -237,6 +237,66 @@ try {
   expect(storageBucket.name).toBe('sample')
 
   /**
+   * clean up caches before caches feature test
+   */
+  for (const key of await window.caches.keys()) {
+    await window.caches.delete(key)
+  }
+
+  /**
+   * StorageBucket must support manage caches
+   */
+  expect(await storageBucket.caches.has('sample')).toBe(false)
+  expect((await storageBucket.caches.keys()).length).toBe(0)
+  expect((await storageBucket.caches.keys()).includes('sample')).toBe(false)
+  expect(await storageBucket.caches.delete('sample')).toBe(false)
+
+  const cache = await storageBucket.caches.open('sample')
+  expect(cache).toBeDefined()
+
+  expect(await storageBucket.caches.has('sample')).toBe(true)
+  expect((await storageBucket.caches.keys()).length).toBe(1)
+  expect((await storageBucket.caches.keys()).includes('sample')).toBe(true)
+
+  const req = new Request(location.href + 'sample')
+  const res = new Response(location.href + 'sample')
+
+  expect(await cache.delete(req)).toBe(false)
+  expect(await storageBucket.caches.match(req)).toBeUndefined()
+  expect((await cache.keys()).length).toBe(0)
+  expect(await cache.match(req)).toBeUndefined()
+  expect((await cache.matchAll(req)).length).toBe(0)
+
+  await cache.put(req, res)
+
+  expect(await storageBucket.caches.match(req)).toBeDefined()
+  expect((await cache.keys()).length).toBe(1)
+  expect(await cache.match(req)).toBeDefined()
+  expect((await cache.matchAll(req)).length).toBe(1)
+
+  expect(await cache.delete(req)).toBe(true)
+
+  expect(await cache.delete(req)).toBe(false)
+  expect(await storageBucket.caches.match(req)).toBeUndefined()
+  expect((await cache.keys()).length).toBe(0)
+  expect(await cache.match(req)).toBeUndefined()
+  expect((await cache.matchAll(req)).length).toBe(0)
+
+  expect(await storageBucket.caches.delete('sample')).toBe(true)
+
+  expect(await storageBucket.caches.has('sample')).toBe(false)
+  expect((await storageBucket.caches.keys()).length).toBe(0)
+  expect((await storageBucket.caches.keys()).includes('sample')).toBe(false)
+  expect(await storageBucket.caches.delete('sample')).toBe(false)
+
+  /**
+   * clean up caches after caches feature test
+   */
+  for (const key of await window.caches.keys()) {
+    await window.caches.delete(key)
+  }
+
+  /**
    * delete storage bucket after feature test
    */
   await navigator.storageBuckets.delete('sample')
