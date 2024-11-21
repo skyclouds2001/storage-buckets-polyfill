@@ -279,13 +279,13 @@
       get: (target, p, receiver) => {
         switch (p) {
           case 'cmp':
-            return (first, second) => Reflect.get(target, 'cmp', receiver)(first, second)
+            return (first, second) => Reflect.get(target, 'cmp', receiver).call(target, first, second)
           case 'databases':
-            return () => Reflect.get(target, 'databases', receiver)().then((databases) => databases.filter((database) => database.name.startsWith(MetaDataStorageKey + $name)).map(({ name, version }) => ({ name: name.replace(searchReg, ''), version })))
+            return () => Reflect.get(target, 'databases', receiver).call(target).then((databases) => databases.filter((database) => database.name.startsWith(MetaDataStorageKey + $name)).map(({ name, version }) => ({ name: name.replace(searchReg, ''), version })))
           case 'deleteDatabase':
-            return (name) => Reflect.get(target, 'deleteDatabase', receiver)(MetaDataStorageKey + $name + name)
+            return (name) => Reflect.get(target, 'deleteDatabase', receiver).call(target, MetaDataStorageKey + $name + name)
           case 'open':
-            return (name, version) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + name, version)
+            return (name, version) => Reflect.get(target, 'open', receiver).call(target, MetaDataStorageKey + $name + name, version)
         }
       },
     })
@@ -304,15 +304,15 @@
       get: (target, p, receiver) => {
         switch (p) {
           case 'delete':
-            return (cacheName) => Reflect.get(target, 'delete', receiver)(MetaDataStorageKey + $name + cacheName)
+            return (cacheName) => Reflect.get(target, 'delete', receiver).call(target, MetaDataStorageKey + $name + cacheName)
           case 'has':
-            return (cacheName) => Reflect.get(target, 'has', receiver)(MetaDataStorageKey + $name + cacheName)
+            return (cacheName) => Reflect.get(target, 'has', receiver).call(target, MetaDataStorageKey + $name + cacheName)
           case 'keys':
-            return () => Reflect.get(target, 'keys', receiver)().then((keys) => keys.map(key => key.replace(searchReg, '')))
+            return () => Reflect.get(target, 'keys', receiver).call(target).then((keys) => keys.map(key => key.replace(searchReg, '')))
           case 'match':
-            return (request, options) => Reflect.get(target, 'match', receiver)(request, options)
+            return (request, options) => Reflect.get(target, 'match', receiver).call(target)(request, options)
           case 'open':
-            return (cacheName) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + cacheName)
+            return (cacheName) => Reflect.get(target, 'open', receiver).call(target, MetaDataStorageKey + $name + cacheName)
         }
       },
     })
