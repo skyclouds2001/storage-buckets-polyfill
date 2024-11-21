@@ -3,26 +3,38 @@ const result = document.getElementById('result')
 const expect = (result) => {
   const toBe = (value) => {
     if (!Object.is(result, value)) {
-      throw `Expected: ${value}, Got: ${result}`
+      throw `Expected to be ${value}; Got ${result}`
     }
   }
 
   const toBeDefined = () => {
     if (result === undefined) {
-      throw `Expected to be defined`
+      throw `Expected not to be undefined; Got ${result}`
     }
   }
 
   const toBeUndefined = () => {
     if (result !== undefined) {
-      throw `Expected to be undefined`
+      throw `Expected to be undefined; Got ${result}`
+    }
+  }
+
+  const toBeNull = () => {
+    if (result !== null) {
+      throw `Expected to be null; Got ${result}`
+    }
+  }
+
+  const toBeNaN = () => {
+    if (!Number.isNaN(result)) {
+      throw `Expected to be NaN; Got ${result}`
     }
   }
 
   const toThrow = () => {
     try {
       result()
-      throw 'Expected to throw'
+      throw `Expected to throw`
     } catch { }
   }
 
@@ -30,6 +42,8 @@ const expect = (result) => {
     toBe,
     toBeDefined,
     toBeUndefined,
+    toBeNull,
+    toBeNaN,
     toThrow,
   }
 }
