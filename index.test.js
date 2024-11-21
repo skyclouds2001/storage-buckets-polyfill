@@ -133,7 +133,7 @@ try {
   }
 
   /**
-   * clean up storage buckets for feature test
+   * clean up storage buckets before feature test
    */
   for (const key of await navigator.storageBuckets.keys()) {
     await navigator.storageBuckets.delete(key)
@@ -145,7 +145,12 @@ try {
   expect((await navigator.storageBuckets.keys()).length).toBe(0)
   expect(await navigator.storageBuckets.open('sample')).toBeDefined()
   expect((await navigator.storageBuckets.keys()).length).toBe(1)
+  expect(await navigator.storageBuckets.open('sample-sample')).toBeDefined()
+  expect((await navigator.storageBuckets.keys()).length).toBe(2)
   expect(await navigator.storageBuckets.delete('sample')).toBeUndefined()
+  expect((await navigator.storageBuckets.keys()).length).toBe(1)
+  expect(await navigator.storageBuckets.delete('sample-sample')).toBeUndefined()
+  expect((await navigator.storageBuckets.keys()).length).toBe(0)
 
   /**
    * StorageBucketManager should throw if open storage buckets and delete storage buckets without name parameters
@@ -160,7 +165,7 @@ try {
     } catch { }
 
   /**
-   * clean up storage buckets for feature test
+   * clean up storage buckets after feature test
    */
   for (const key of await navigator.storageBuckets.keys()) {
     await navigator.storageBuckets.delete(key)
