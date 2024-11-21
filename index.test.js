@@ -100,10 +100,14 @@ try {
   expect(Object.getOwnPropertyDescriptor(Navigator.prototype, 'storageBuckets').configurable).toBe(true)
 
   /**
-   * access `storageBuckets` property via Navigator.prototype must throw, via navigator must not throw
+   * access `storageBuckets` property via Navigator.prototype must throw
    */
-  expect(navigator.storageBuckets).toBeDefined()
   expect(() => Navigator.prototype.storageBuckets).toThrow()
+
+  /**
+   * `navigator.storageBuckets` property must always return a sample object
+   */
+  expect(navigator.storageBuckets).toBe(navigator.storageBuckets)
 
   for (const key of ['open', 'keys', 'delete']) {
     /**
@@ -153,7 +157,7 @@ try {
   expect((await navigator.storageBuckets.keys()).length).toBe(0)
 
   /**
-   * StorageBucketManager should throw if open storage buckets and delete storage buckets without name parameters
+   * StorageBucketManager should throw if open storage buckets and delete storage buckets without passing name parameters
    */
   try {
     await navigator.storageBuckets.open()
@@ -163,6 +167,11 @@ try {
     await navigator.storageBuckets.delete()
     throw 'Expected to throw'
   } catch { }
+
+  /**
+   * StorageBucketManager should always return different storage buckets when open storage bucket
+   */
+  expect(await navigator.storageBuckets.open('sample') !== await navigator.storageBuckets.open('sample'))
 
   /**
    * clean up storage buckets after feature test
