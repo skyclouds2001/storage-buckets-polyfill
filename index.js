@@ -274,6 +274,7 @@
   /** @type {() => StorageBucket['indexedDB']} */
   const $indexedDB = function () {
     const searchReg = new RegExp('^' + MetaDataStorageKey + this[$$name])
+    const $name = this[$$name]
 
     return new Proxy(global.indexedDB, {
       get: (target, p, receiver) => {
@@ -300,6 +301,9 @@
 
   /** @type {() => StorageBucket['caches']} */
   const $caches = function () {
+    const searchReg = new RegExp('^' + MetaDataStorageKey + this[$$name])
+    const $name = this[$$name]
+
     return new Proxy(global.caches, {
       get: (target, p, receiver) => {
         switch (p) {
