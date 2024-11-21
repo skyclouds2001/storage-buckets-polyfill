@@ -180,7 +180,7 @@ try {
     await navigator.storageBuckets.delete(key)
   }
 
-  for (const key of ['name']) {
+  for (const key of ['name', 'indexedDB', 'caches']) {
     /**
      * StorageBucket's property members must throw if not call as StorageBucket's member
      */

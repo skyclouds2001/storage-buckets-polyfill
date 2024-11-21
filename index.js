@@ -33,8 +33,8 @@
       // persisted: false,
       // quota: 0,
       // expires: 0,
-      // indexdb: [],
-      // cache: [],
+      indexdb: [],
+      cache: [],
       // opfs: [],
     }
   }
@@ -108,7 +108,7 @@
           name,
         }),
 
-        await $writeEntries(entries)
+          await $writeEntries(entries)
       } else {
         throw error
       }
@@ -180,13 +180,13 @@
         return
       }
 
-      // const { indexdb, cache, opfs } = entry
-      // indexdb.forEach((el) => {
-      //   global.indexedDB.deleteDatabase(MetaDataStorageKey + name + el)
-      // })
-      // cache.forEach((el) => {
-      //   global.caches.delete(MetaDataStorageKey + name + el)
-      // })
+      const { indexdb, cache, opfs } = entry
+      indexdb.forEach((el) => {
+        global.indexedDB.deleteDatabase(MetaDataStorageKey + name + el)
+      })
+      cache.forEach((el) => {
+        global.caches.delete(MetaDataStorageKey + name + el)
+      })
       // opfs.forEach((el) => {
       //   rootHandle.removeEntry(MetaDataStorageKey + name + el)
       // })
@@ -224,54 +224,6 @@
     }
 
     this[$$name] = name
-
-    // const searchReg = new RegExp('^' + MetaDataStorageKey + $name)
-
-    // const $indexedDB = new Proxy(global.indexedDB, {
-    //   get: (target, p, receiver) => {
-    //     switch (p) {
-    //       case 'cmp':
-    //         return (first, second) => Reflect.get(target, 'cmp', receiver)(first, second)
-    //       case 'databases':
-    //         return () => Reflect.get(target, 'databases', receiver)().then((databases) => databases.filter((database) => database.startsWith(MetaDataStorageKey + $name)).map(({ name, version }) => ({ name: name.replace(searchReg, ''), version })))
-    //       case 'deleteDatabase':
-    //         return (name) => Reflect.get(target, 'deleteDatabase', receiver)(MetaDataStorageKey + $name + name)
-    //       case 'open':
-    //         return (name, version) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + name, version)
-    //     }
-    //   },
-    // })
-
-    // Object.defineProperty(this, 'indexedDB', {
-    //   configurable: true,
-    //   enumerable: true,
-    //   get: () => $indexedDB,
-    //   set: undefined,
-    // })
-
-    // const $caches = new Proxy(global.caches, {
-    //   get: (target, p, receiver) => {
-    //     switch (p) {
-    //       case 'delete':
-    //         return (cacheName) => Reflect.get(target, 'delete', receiver)(MetaDataStorageKey + $name + cacheName)
-    //       case 'has':
-    //         return (cacheName) => Reflect.get(target, 'has', receiver)(MetaDataStorageKey + $name + cacheName)
-    //       case 'keys':
-    //         return () => Reflect.get(target, 'keys', receiver)().then((keys) => keys.map(key => key.replace(searchReg, '')))
-    //       case 'match':
-    //         return (request, options) => Reflect.get(target, 'match', receiver)(request, options)
-    //       case 'open':
-    //         return (cacheName) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + cacheName)
-    //     }
-    //   },
-    // })
-
-    // Object.defineProperty(this, 'caches', {
-    //   configurable: true,
-    //   enumerable: true,
-    //   get: () => $caches,
-    //   set: undefined,
-    // })
   }
 
   Object.defineProperty($StorageBucket, 'name', {
@@ -307,6 +259,58 @@
     configurable: true,
     enumerable: true,
     get: $name,
+    set: undefined,
+  })
+
+  const $indexedDB = function () {
+    const searchReg = new RegExp('^' + MetaDataStorageKey + this[$$name])
+
+    return new Proxy(global.indexedDB, {
+      get: (target, p, receiver) => {
+        switch (p) {
+          case 'cmp':
+            return (first, second) => Reflect.get(target, 'cmp', receiver)(first, second)
+          case 'databases':
+            return () => Reflect.get(target, 'databases', receiver)().then((databases) => databases.filter((database) => database.name.startsWith(MetaDataStorageKey + $name)).map(({ name, version }) => ({ name: name.replace(searchReg, ''), version })))
+          case 'deleteDatabase':
+            return (name) => Reflect.get(target, 'deleteDatabase', receiver)(MetaDataStorageKey + $name + name)
+          case 'open':
+            return (name, version) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + name, version)
+        }
+      },
+    })
+  }
+
+  Object.defineProperty($StorageBucket.prototype, 'indexedDB', {
+    configurable: true,
+    enumerable: true,
+    get: $indexedDB,
+    set: undefined,
+  })
+
+  const $caches = function () {
+    return new Proxy(global.caches, {
+      get: (target, p, receiver) => {
+        switch (p) {
+          case 'delete':
+            return (cacheName) => Reflect.get(target, 'delete', receiver)(MetaDataStorageKey + $name + cacheName)
+          case 'has':
+            return (cacheName) => Reflect.get(target, 'has', receiver)(MetaDataStorageKey + $name + cacheName)
+          case 'keys':
+            return () => Reflect.get(target, 'keys', receiver)().then((keys) => keys.map(key => key.replace(searchReg, '')))
+          case 'match':
+            return (request, options) => Reflect.get(target, 'match', receiver)(request, options)
+          case 'open':
+            return (cacheName) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + cacheName)
+        }
+      },
+    })
+  }
+
+  Object.defineProperty($StorageBucket.prototype, 'caches', {
+    configurable: true,
+    enumerable: true,
+    get: $caches,
     set: undefined,
   })
 
