@@ -151,7 +151,7 @@ try {
   }
 
   /**
-   * clean up storage buckets before feature test
+   * clean up storage buckets before storage bucket management feature test
    */
   for (const key of await navigator.storageBuckets.keys()) {
     await navigator.storageBuckets.delete(key)
@@ -188,7 +188,7 @@ try {
   expect(await navigator.storageBuckets.open('sample') !== await navigator.storageBuckets.open('sample'))
 
   /**
-   * clean up storage buckets after feature test
+   * clean up storage buckets after storage bucket management feature test
    */
   for (const key of await navigator.storageBuckets.keys()) {
     await navigator.storageBuckets.delete(key)
@@ -240,7 +240,7 @@ try {
   }
 
   /**
-   * create storage bucket before feature test
+   * create storage bucket before storage bucket feature test
    */
   const storageBucket = await navigator.storageBuckets.open('sample')
 
@@ -251,14 +251,14 @@ try {
   expect(storageBucket.name).toBe('sample')
 
   /**
-   * clean up caches before caches feature test
+   * clean up Cache Storage before Cache Storage feature test
    */
   for (const key of await window.caches.keys()) {
     await window.caches.delete(key)
   }
 
   /**
-   * StorageBucket must support manage caches
+   * StorageBucket must support manage Cache Storage
    */
   expect(await storageBucket.caches.has('sample')).toBe(false)
   expect((await storageBucket.caches.keys()).length).toBe(0)
@@ -304,14 +304,65 @@ try {
   expect(await storageBucket.caches.delete('sample')).toBe(false)
 
   /**
-   * clean up caches after caches feature test
+   * clean up Cache Storage after Cache Storage feature test
    */
   for (const key of await window.caches.keys()) {
     await window.caches.delete(key)
   }
 
   /**
-   * delete storage bucket after feature test
+   * clean up IndexDB before IndexDB feature test
+   */
+  for (const database of await window.indexedDB.databases()) {
+    await new Promise((resolve, reject) => {
+      const req = window.indexedDB.deleteDatabase(database.name)
+
+      req.onerror = () => reject(req.error)
+      req.onsuccess = () => resolve(req.result)
+    })
+  }
+
+  /**
+   * StorageBucket must support manage IndexDB
+   */
+  expect((await storageBucket.indexedDB.databases()).length).toBe(0)
+
+  await new Promise((resolve, reject) => {
+    const req = storageBucket.indexedDB.open('sample')
+
+    req.onerror = () => reject(req.error)
+    req.onsuccess = () => resolve(req.result)
+  })
+
+  expect((await storageBucket.indexedDB.databases()).length).toBe(1)
+
+  await new Promise((resolve, reject) => {
+    const req = storageBucket.indexedDB.deleteDatabase('sample')
+
+    req.onerror = () => reject(req.error)
+    req.onsuccess = () => resolve(req.result)
+  })
+
+  expect((await storageBucket.indexedDB.databases()).length).toBe(0)
+
+  expect(storageBucket.indexedDB.cmp(1, 0)).toBe(1)
+  expect(storageBucket.indexedDB.cmp(0, 0)).toBe(0)
+  expect(storageBucket.indexedDB.cmp(0, 1)).toBe(-1)
+
+  /**
+   * clean up IndexDB after IndexDB feature test
+   */
+  for (const database of await window.indexedDB.databases()) {
+    await new Promise((resolve, reject) => {
+      const req = window.indexedDB.deleteDatabase(database.name)
+
+      req.onerror = () => reject(req.error)
+      req.onsuccess = () => resolve(req.result)
+    })
+  }
+
+  /**
+   * delete storage bucket after storage bucket feature test
    */
   await navigator.storageBuckets.delete('sample')
 
