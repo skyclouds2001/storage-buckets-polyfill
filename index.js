@@ -25,7 +25,7 @@
 
   const MetaDataStorageKey = 'storage-buckets-polyfill'
 
-  const $createEntry = async ({
+  const $createEntry = ({
     name,
   }) => {
     return {
