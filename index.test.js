@@ -155,14 +155,75 @@ try {
   /**
    * StorageBucketManager should throw if open storage buckets and delete storage buckets without name parameters
    */
+  try {
+    await navigator.storageBuckets.open()
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await navigator.storageBuckets.delete()
+    throw 'Expected to throw'
+  } catch { }
+
+  for (const key of ['name']) {
+    /**
+     * StorageBucket's property members must throw if not call as StorageBucket's member
+     */
     try {
-      await navigator.storageBuckets.open()
+      globalThis.StorageBucket.prototype[key]
       throw 'Expected to throw'
     } catch { }
+
+    /**
+     * StorageBucket's property members must be defined as getter and without setter, enumerable and configurable
+     */
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket.prototype, key).get).toBeDefined()
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket.prototype, key).set).toBeUndefined()
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket.prototype, key).enumerable).toBe(true)
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket.prototype, key).configurable).toBe(true)
+  }
+
+  for (const key of []) {
+    /**
+     * StorageBucket's function members must be defined, writable, enumerable and configurable
+     */
+    expect(globalThis.StorageBucket.prototype[key]).toBeDefined()
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket.prototype, key).writable).toBe(true)
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket.prototype, key).enumerable).toBe(true)
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket.prototype, key).configurable).toBe(true)
+
+    /**
+     * StorageBucket's function members must have `name` property and should be equal to the member's name, which should be configurable, not writable and not enumerable
+     */
+    expect(globalThis.StorageBucket.prototype[key].name).toBe(key)
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket, 'name').writable).toBe(false)
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket, 'name').enumerable).toBe(false)
+    expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket, 'name').configurable).toBe(true)
+
+    /**
+     * StorageBucket's function members must throw if not call as StorageBucket's member
+     */
+    const fn = globalThis.StorageBucket.prototype[key]
     try {
-      await navigator.storageBuckets.delete()
+      await fn()
       throw 'Expected to throw'
     } catch { }
+  }
+
+  /**
+   * create storage bucket after feature test
+   */
+  const storageBucket = await navigator.storageBuckets.open('sample')
+
+  /**
+   * StorageBucket must have a name and should be equal to the passing parameter when initial
+   */
+  expect(storageBucket.name).toBeDefined()
+  expect(storageBucket.name).toBe('sample')
+
+  /**
+   * delete storage bucket after feature test
+   */
+  await navigator.storageBuckets.delete('sample')
 
   /**
    * clean up storage buckets after feature test

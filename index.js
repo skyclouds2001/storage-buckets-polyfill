@@ -202,67 +202,62 @@
     writable: true,
   })
 
+  const $$name = Symbol()
+
   const $StorageBucket = function StorageBucket(sym, name) {
     if (!Object.is(sym, symbol)) {
       throw new TypeError('Illegal constructor')
     }
 
-    const $name = name
+    this[$$name] = name
 
-    Object.defineProperty(this, 'name', {
-      configurable: true,
-      enumerable: true,
-      get: () => $name,
-      set: undefined,
-    })
+    // const searchReg = new RegExp('^' + MetaDataStorageKey + $name)
 
-    const searchReg = new RegExp('^' + MetaDataStorageKey + $name)
+    // const $indexedDB = new Proxy(global.indexedDB, {
+    //   get: (target, p, receiver) => {
+    //     switch (p) {
+    //       case 'cmp':
+    //         return (first, second) => Reflect.get(target, 'cmp', receiver)(first, second)
+    //       case 'databases':
+    //         return () => Reflect.get(target, 'databases', receiver)().then((databases) => databases.filter((database) => database.startsWith(MetaDataStorageKey + $name)).map(({ name, version }) => ({ name: name.replace(searchReg, ''), version })))
+    //       case 'deleteDatabase':
+    //         return (name) => Reflect.get(target, 'deleteDatabase', receiver)(MetaDataStorageKey + $name + name)
+    //       case 'open':
+    //         return (name, version) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + name, version)
+    //     }
+    //   },
+    // })
 
-    const $indexedDB = new Proxy(global.indexedDB, {
-      get: (target, p, receiver) => {
-        switch (p) {
-          case 'cmp':
-            return (first, second) => Reflect.get(target, 'cmp', receiver)(first, second)
-          case 'databases':
-            return () => Reflect.get(target, 'databases', receiver)().then((databases) => databases.filter((database) => database.startsWith(MetaDataStorageKey + $name)).map(({ name, version }) => ({ name: name.replace(searchReg, ''), version })))
-          case 'deleteDatabase':
-            return (name) => Reflect.get(target, 'deleteDatabase', receiver)(MetaDataStorageKey + $name + name)
-          case 'open':
-            return (name, version) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + name, version)
-        }
-      },
-    })
+    // Object.defineProperty(this, 'indexedDB', {
+    //   configurable: true,
+    //   enumerable: true,
+    //   get: () => $indexedDB,
+    //   set: undefined,
+    // })
 
-    Object.defineProperty(this, 'indexedDB', {
-      configurable: true,
-      enumerable: true,
-      get: () => $indexedDB,
-      set: undefined,
-    })
+    // const $caches = new Proxy(global.caches, {
+    //   get: (target, p, receiver) => {
+    //     switch (p) {
+    //       case 'delete':
+    //         return (cacheName) => Reflect.get(target, 'delete', receiver)(MetaDataStorageKey + $name + cacheName)
+    //       case 'has':
+    //         return (cacheName) => Reflect.get(target, 'has', receiver)(MetaDataStorageKey + $name + cacheName)
+    //       case 'keys':
+    //         return () => Reflect.get(target, 'keys', receiver)().then((keys) => keys.map(key => key.replace(searchReg, '')))
+    //       case 'match':
+    //         return (request, options) => Reflect.get(target, 'match', receiver)(request, options)
+    //       case 'open':
+    //         return (cacheName) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + cacheName)
+    //     }
+    //   },
+    // })
 
-    const $caches = new Proxy(global.caches, {
-      get: (target, p, receiver) => {
-        switch (p) {
-          case 'delete':
-            return (cacheName) => Reflect.get(target, 'delete', receiver)(MetaDataStorageKey + $name + cacheName)
-          case 'has':
-            return (cacheName) => Reflect.get(target, 'has', receiver)(MetaDataStorageKey + $name + cacheName)
-          case 'keys':
-            return () => Reflect.get(target, 'keys', receiver)().then((keys) => keys.map(key => key.replace(searchReg, '')))
-          case 'match':
-            return (request, options) => Reflect.get(target, 'match', receiver)(request, options)
-          case 'open':
-            return (cacheName) => Reflect.get(target, 'open', receiver)(MetaDataStorageKey + $name + cacheName)
-        }
-      },
-    })
-
-    Object.defineProperty(this, 'caches', {
-      configurable: true,
-      enumerable: true,
-      get: () => $caches,
-      set: undefined,
-    })
+    // Object.defineProperty(this, 'caches', {
+    //   configurable: true,
+    //   enumerable: true,
+    //   get: () => $caches,
+    //   set: undefined,
+    // })
   }
 
   Object.defineProperty($StorageBucket, 'name', {
@@ -284,6 +279,21 @@
     enumerable: false,
     value: $StorageBucket,
     writable: true,
+  })
+
+  const $name = function () {
+    if (Object.getPrototypeOf(this) !== $StorageBucket.prototype) {
+      throw new TypeError('Illegal invocation')
+    }
+
+    return this[$$name]
+  }
+
+  Object.defineProperty($StorageBucket.prototype, 'name', {
+    configurable: true,
+    enumerable: true,
+    get: $name,
+    set: undefined,
   })
 
   const storageBuckets = new $StorageBucketManager(symbol)
