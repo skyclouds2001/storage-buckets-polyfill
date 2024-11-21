@@ -296,30 +296,32 @@
     set: undefined,
   })
 
-  const storageBuckets = new $StorageBucketManager(symbol)
-
   if (isInWindow) {
+    const $storageBuckets = new $StorageBucketManager(symbol)
+
     Object.defineProperty(Navigator.prototype, 'storageBuckets', {
       configurable: true,
       enumerable: true,
       get: function () {
-        if (this !== global.navigator) {
+        if ((Object.getPrototypeOf(this) !== Navigator.prototype)) {
           throw new TypeError('Illegal invocation')
         }
-        return storageBuckets
+        return $storageBuckets
       },
       set: undefined,
     })
   }
   if (isInWorker) {
+    const $storageBuckets = new $StorageBucketManager(symbol)
+
     Object.defineProperty(WorkerNavigator.prototype, 'storageBuckets', {
       configurable: true,
       enumerable: true,
       get: function () {
-        if (this !== global.navigator) {
+        if ((Object.getPrototypeOf(this) !== WorkerNavigator.prototype)) {
           throw new TypeError('Illegal invocation')
         }
-        return storageBuckets
+        return $storageBuckets
       },
       set: undefined,
     })
