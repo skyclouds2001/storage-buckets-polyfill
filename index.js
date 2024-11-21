@@ -21,7 +21,7 @@
     return
   }
 
-  const symbol = Symbol()
+  let allowConstruct = false
 
   const MetaDataStorageKey = 'storage-buckets-polyfill'
 
@@ -57,8 +57,8 @@
     await writableStream.close()
   }
 
-  const $StorageBucketManager = function StorageBucketManager(sym) {
-    if (!Object.is(sym, symbol)) {
+  const $StorageBucketManager = function StorageBucketManager() {
+    if (!allowConstruct) {
       throw new TypeError('Illegal constructor')
     }
   }
@@ -113,7 +113,10 @@
         throw error
       }
     }
-    const storageBucket = new $StorageBucket(symbol, name)
+
+    allowConstruct = true
+    const storageBucket = new $StorageBucket(name)
+    allowConstruct = false
     return storageBucket
   }
 
@@ -218,8 +221,8 @@
 
   const $$name = Symbol()
 
-  const $StorageBucket = function StorageBucket(sym, name) {
-    if (!Object.is(sym, symbol)) {
+  const $StorageBucket = function StorageBucket(name) {
+    if (!allowConstruct) {
       throw new TypeError('Illegal constructor')
     }
 
@@ -315,7 +318,9 @@
   })
 
   if (isInWindow) {
-    const $storageBuckets = new $StorageBucketManager(symbol)
+    allowConstruct = true
+    const $storageBuckets = new $StorageBucketManager()
+    allowConstruct = false
 
     Object.defineProperty(Navigator.prototype, 'storageBuckets', {
       configurable: true,
@@ -330,7 +335,9 @@
     })
   }
   if (isInWorker) {
-    const $storageBuckets = new $StorageBucketManager(symbol)
+    allowConstruct = true
+    const $storageBuckets = new $StorageBucketManager()
+    allowConstruct = false
 
     Object.defineProperty(WorkerNavigator.prototype, 'storageBuckets', {
       configurable: true,
