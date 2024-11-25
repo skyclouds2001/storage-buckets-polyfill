@@ -268,6 +268,8 @@ try {
   const cache = await storageBucket.caches.open('sample')
   expect(cache).toBeDefined()
 
+  expect(await window.caches.has('sample')).toBe(false)
+
   expect(await storageBucket.caches.has('sample')).toBe(true)
   expect((await storageBucket.caches.keys()).length).toBe(1)
   expect((await storageBucket.caches.keys()).includes('sample')).toBe(true)
@@ -333,6 +335,8 @@ try {
     req.onerror = () => reject(req.error)
     req.onsuccess = () => resolve(req.result)
   })
+
+  expect((await window.indexedDB.databases()).some((db) => db.name === 'sample')).toBe(false)
 
   expect((await storageBucket.indexedDB.databases()).length).toBe(1)
 
