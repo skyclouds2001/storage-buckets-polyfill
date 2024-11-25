@@ -345,6 +345,10 @@
 
   /** @type {StorageBucket['getDirectory']} */
   const $getDirectory = async function () {
+    if (Object.getPrototypeOf(this) !== $StorageBucket.prototype) {
+      throw new TypeError('Failed to execute \'getDirectory\' on \'StorageBucket\': Illegal invocation')
+    }
+
     const searchReg = new RegExp('^' + MetaDataStorageKey + this[$$name])
     const $name = this[$$name]
 
