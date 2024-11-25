@@ -525,6 +525,58 @@
     writable: true,
   })
 
+  const $persist = async function () {
+    if (Object.getPrototypeOf(this) !== $StorageBucket.prototype) {
+      throw new TypeError('Failed to execute \'persist\' on \'StorageBucket\': Illegal invocation')
+    }
+
+    if (this[$$removed]) {
+      throw new DOMException('Unknown error occurred while requesting persist.', 'InvalidStateError')
+    }
+
+    return await navigator.storage.persisted()
+  }
+
+  Object.defineProperty($persist, 'name', {
+    configurable: true,
+    enumerable: false,
+    value: 'persist',
+    writable: false,
+  })
+
+  Object.defineProperty($StorageBucket.prototype, 'persist', {
+    configurable: true,
+    enumerable: true,
+    value: $persist,
+    writable: true,
+  })
+
+  const $persisted = async function () {
+    if (Object.getPrototypeOf(this) !== $StorageBucket.prototype) {
+      throw new TypeError('Failed to execute \'persisted\' on \'StorageBucket\': Illegal invocation')
+    }
+
+    if (this[$$removed]) {
+      throw new DOMException('Unknown error occurred while getting persisted.', 'InvalidStateError')
+    }
+
+    return await navigator.storage.persisted()
+  }
+
+  Object.defineProperty($persisted, 'name', {
+    configurable: true,
+    enumerable: false,
+    value: 'persisted',
+    writable: false,
+  })
+
+  Object.defineProperty($StorageBucket.prototype, 'persisted', {
+    configurable: true,
+    enumerable: true,
+    value: $persisted,
+    writable: true,
+  })
+
   if (isInWindow) {
     allowConstruct = true
     const $storageBuckets = new $StorageBucketManager()

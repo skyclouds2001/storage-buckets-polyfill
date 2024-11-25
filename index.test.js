@@ -212,7 +212,7 @@ try {
     expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket.prototype, key).configurable).toBe(true)
   }
 
-  for (const key of ['getDirectory', 'expires', 'setExpires']) {
+  for (const key of ['getDirectory', 'expires', 'setExpires', 'estimate', 'persist', 'persisted']) {
     /**
      * StorageBucket's function members must be defined, writable, enumerable and configurable
      */
@@ -511,6 +511,14 @@ try {
     await storageBucket.estimate()
     throw 'Expected to throw'
   } catch { }
+  try {
+    await storageBucket.persist()
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await storageBucket.persisted()
+    throw 'Expected to throw'
+  } catch { }
 
   {
     const timestamp = Date.now() + 10000
@@ -531,6 +539,12 @@ try {
     const storageBucket = await navigator.storageBuckets.open('abcdefg')
     expect((await storageBucket.estimate()).usage).toBe(0)
     expect((await storageBucket.estimate()).quota).toBe((await navigator.storage.estimate()).quota)
+  }
+
+  {
+    const storageBucket = await navigator.storageBuckets.open('abcdefg')
+    expect(await storageBucket.persist()).toBe(await navigator.storage.persisted())
+    expect(await storageBucket.persisted()).toBe(await navigator.storage.persisted())
   }
 
   result.textContent = 'Test Succeeded!'
