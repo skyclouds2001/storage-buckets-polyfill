@@ -358,9 +358,9 @@
       get: (target, p, receiver) => {
         switch (p) {
           case 'kind':
-            return Reflect.get(target, 'kind', receiver)
+            return target['kind']
           case 'name':
-            return Reflect.get(target, 'name', receiver).replace(searchReg, '')
+            return target['name']
           case 'isSameEntry':
             return (other) => Reflect.get(target, 'isSameEntry', receiver).call(target, other)
           case 'getDirectoryHandle':
