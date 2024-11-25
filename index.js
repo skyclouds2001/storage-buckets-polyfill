@@ -36,7 +36,7 @@
       expires: options.expires ?? Number.POSITIVE_INFINITY,
       indexdb: [],
       cache: [],
-      // opfs: [],
+      opfs: [],
     }
   }
 
@@ -184,6 +184,10 @@
         throw new TypeError('Failed to execute \'delete\' on \'StorageBucketManager\': 1 argument required, but only 0 present.')
       }
 
+      const indexedDB = global.indexedDB
+      const caches = global.caches
+      const rootHandle = await global.navigator.storage.getDirectory()
+
       const entries = await $readEntries()
       const entry = entries[name]
       if (entry == null) {
@@ -191,15 +195,16 @@
       }
 
       const { indexdb, cache, opfs } = entry
-      indexdb.forEach((el) => {
-        global.indexedDB.deleteDatabase(MetaDataStorageKey + name + el)
-      })
-      cache.forEach((el) => {
-        global.caches.delete(MetaDataStorageKey + name + el)
-      })
-      // opfs.forEach((el) => {
-      //   rootHandle.removeEntry(MetaDataStorageKey + name + el)
-      // })
+      await Promise.all([
+        Promise.all(indexdb.map(new Promise((resolve, reject) => {
+          const req = indexedDB.deleteDatabase(database.name)
+
+          req.onerror = () => reject(req.error)
+          req.onsuccess = () => resolve(req.result)
+        }))),
+        Promise.all(cache.map((el) => caches.delete(MetaDataStorageKey + name + el))),
+        Promise.all(opfs.map((el) => rootHandle.removeEntry(MetaDataStorageKey + name + el))),
+      ])
 
       delete entries[name]
       await $writeEntries(entries)
