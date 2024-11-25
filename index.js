@@ -123,6 +123,24 @@
         throw new TypeError(`The bucket name '${name}' is not a valid name.`)
       }
 
+      if (options != null) {
+        if (options.expires != null && options.expires <= global.performance.timeOrigin + performance.now()) {
+          throw new TypeError('The bucket expiration is invalid.')
+        }
+
+        if (options.quota != null && options.quota <= 0) {
+          throw new TypeError('The bucket\'s quota cannot less than or equal zero.')
+        }
+
+        if (options.quota != null) {
+          options.quota = (await global.navigator.storage.estimate()).quota
+        }
+
+        if (options.persisted != null) {
+          options.persisted = await global.navigator.storage.persisted()
+        }
+      }
+
       const entries = await $readEntries()
       if (entries[name] == null) {
         entries[name] = $createEntry({

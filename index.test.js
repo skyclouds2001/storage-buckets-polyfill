@@ -467,6 +467,31 @@ try {
     await navigator.storageBuckets.open('_abcdefg')
     throw 'Expected to throw'
   } catch { }
+  try {
+    await navigator.storageBuckets.open('abcdefg', { expires: 0 })
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await navigator.storageBuckets.open('abcdefg', { expires: -Date.now() })
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await navigator.storageBuckets.open('abcdefg', { expires: Date.now() })
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await navigator.storageBuckets.open('abcdefg', { quota: 0 })
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await navigator.storageBuckets.open('abcdefg', { quota: -10 })
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await navigator.storageBuckets.open('abcdefg', { quota: 10 })
+  } catch {
+    throw 'Expected not to throw'
+  }
 
   result.textContent = 'Test Succeeded!'
 
