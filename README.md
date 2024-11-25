@@ -2,6 +2,21 @@
 
 The polyfill of the [Storage Buckets API](https://wicg.github.io/storage-buckets/).
 
+## Note
+
+The polyfill use Origin Private File System to obtain meta info of the storage buckets. The structure of meta info is as follows:
+
+```json
+{
+  "sample": {
+    "name": "sample",
+    "persisted": false,
+    "quota": 0,
+    "expires": 0
+  }
+}
+```
+
 ## Limitations
 
 * HTTP header is not supported:
