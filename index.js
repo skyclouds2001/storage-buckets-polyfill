@@ -349,47 +349,11 @@
       throw new TypeError('Failed to execute \'getDirectory\' on \'StorageBucket\': Illegal invocation')
     }
 
-    const searchReg = new RegExp('^' + MetaDataStorageKey + this[$$name])
-    const $name = this[$$name]
-
     const rootHandle = await global.navigator.storage.getDirectory()
 
-    return new Proxy(rootHandle, {
-      get: (target, p, receiver) => {
-        switch (p) {
-          case 'kind':
-            return target['kind']
-          case 'name':
-            return target['name']
-          case 'isSameEntry':
-            return (other) => Reflect.get(target, 'isSameEntry', receiver).call(target, other)
-          case 'getDirectoryHandle':
-            return (name, options) => Reflect.get(target, 'getDirectoryHandle', receiver).call(target, MetaDataStorageKey + $name + name, options)
-          case 'getFileHandle':
-            return (name, options) => Reflect.get(target, 'getFileHandle', receiver).call(target, MetaDataStorageKey + $name + name, options)
-          case 'removeEntry':
-            return (name, options) => Reflect.get(target, 'removeEntry', receiver).call(target, MetaDataStorageKey + $name + name, options)
-          case 'resolve':
-            return (possibleDescendant) => Reflect.get(target, 'resolve', receiver).call(target, possibleDescendant)
-          case 'move':
-            return (destinationDirectory, newEntryName) => Reflect.get(target, 'move', receiver).call(target, destinationDirectory, MetaDataStorageKey + $name + newEntryName)
-          case 'queryPermission':
-            return (descriptor) => Reflect.get(target, 'queryPermission', receiver).call(target, descriptor)
-          case 'requestPermission':
-            return (descriptor) => Reflect.get(target, 'requestPermission', receiver).call(target, descriptor)
-          case 'remove':
-            return (options) => Reflect.get(target, 'remove', receiver).call(target, options)
-          case 'keys':
-            return () => Reflect.get(target, 'keys', receiver).call(target)
-          case 'values':
-            return () => Reflect.get(target, 'values', receiver).call(target)
-          case 'entries':
-            return () => Reflect.get(target, 'entries', receiver).call(target)
-          case Symbol.asyncIterator:
-            return () => Reflect.get(target, Symbol.asyncIterator, receiver).call(target)
-        }
-      },
-    })
+    const storageBucketHandle = await rootHandle.getDirectoryHandle(MetaDataStorageKey + this[$$name], { create: true })
+
+    return storageBucketHandle
   }
 
   Object.defineProperty($getDirectory, 'name', {
