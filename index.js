@@ -76,11 +76,15 @@
     await writableStream.close()
   }
 
+  const $$removed = Symbol()
+
   /** @type {StorageBucketManager} */
   const $StorageBucketManager = function StorageBucketManager() {
     if (!allowConstruct) {
       throw new TypeError('Illegal constructor')
     }
+
+    this[$$removed] = false
   }
 
   Object.defineProperty($StorageBucketManager, 'name', {
@@ -234,6 +238,8 @@
 
       delete entries[name]
       await $writeEntries(entries)
+
+      this[$$removed] = true
     } catch (error) {
       if (error instanceof DOMException && error.name === 'NotFoundError') {
         return
