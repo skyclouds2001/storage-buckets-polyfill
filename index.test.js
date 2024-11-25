@@ -499,6 +499,19 @@ try {
     expect((await navigator.storageBuckets.keys()).includes('abcdefg')).toBe(true)
   }
 
+  try {
+    await storageBucket.expires()
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await storageBucket.setExpires(Date.now() + 10000)
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await storageBucket.estimate()
+    throw 'Expected to throw'
+  } catch { }
+
   {
     const timestamp = Date.now() + 10000
     const storageBucket = await navigator.storageBuckets.open('abcdefg')
@@ -512,6 +525,12 @@ try {
       await storageBucket.setExpires()
       throw 'Expected to throw'
     } catch { }
+  }
+
+  {
+    const storageBucket = await navigator.storageBuckets.open('abcdefg')
+    expect((await storageBucket.estimate()).usage).toBe(0)
+    expect((await storageBucket.estimate()).quota).toBe((await navigator.storage.estimate()).quota)
   }
 
   result.textContent = 'Test Succeeded!'

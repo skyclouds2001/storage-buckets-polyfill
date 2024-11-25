@@ -440,7 +440,7 @@
     writable: true,
   })
 
-  const $setExpires = function (expires) {
+  const $setExpires = async function (expires) {
     if (Object.getPrototypeOf(this) !== $StorageBucket.prototype) {
       throw new TypeError('Failed to execute \'setExpires\' on \'StorageBucket\': Illegal invocation')
     }
@@ -470,9 +470,9 @@
     writable: true,
   })
 
-  const $expires = function () {
+  const $expires = async function () {
     if (Object.getPrototypeOf(this) !== $StorageBucket.prototype) {
-      throw new TypeError('Failed to execute \'getDirectory\' on \'StorageBucket\': Illegal invocation')
+      throw new TypeError('Failed to execute \'expires\' on \'StorageBucket\': Illegal invocation')
     }
 
     if (this[$$removed]) {
@@ -493,6 +493,35 @@
     configurable: true,
     enumerable: true,
     value: $expires,
+    writable: true,
+  })
+
+  const $estimate = async function () {
+    if (Object.getPrototypeOf(this) !== $StorageBucket.prototype) {
+      throw new TypeError('Failed to execute \'estimate\' on \'StorageBucket\': Illegal invocation')
+    }
+
+    if (this[$$removed]) {
+      throw new DOMException('Unknown error occurred while getting estimate.', 'InvalidStateError')
+    }
+
+    return {
+      quota: (await global.navigator.storage.estimate()).quota,
+      usage: 0,
+    }
+  }
+
+  Object.defineProperty($estimate, 'name', {
+    configurable: true,
+    enumerable: false,
+    value: 'estimate',
+    writable: false,
+  })
+
+  Object.defineProperty($StorageBucket.prototype, 'estimate', {
+    configurable: true,
+    enumerable: true,
+    value: $estimate,
     writable: true,
   })
 
