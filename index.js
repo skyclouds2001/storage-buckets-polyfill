@@ -52,9 +52,6 @@
       persisted: options.persisted ?? false,
       quota: options.quota ?? Number.POSITIVE_INFINITY,
       expires: options.expires ?? null,
-      indexdb: [],
-      cache: [],
-      opfs: [],
     }
   }
 
@@ -240,26 +237,22 @@
         throw new TypeError(`The bucket name '${name}' is not a valid name.`)
       }
 
-      const indexedDB = global.indexedDB
-      const caches = global.caches
-      const rootHandle = await global.navigator.storage.getDirectory()
-
       const entries = await $readEntries()
       const entry = entries[name]
       if (entry == null) {
         return
       }
 
-      const { indexdb, cache, opfs } = entry
-      await Promise.all([
-        Promise.all(indexdb.map((el) => new Promise((resolve, reject) => {
-          const req = indexedDB.deleteDatabase(MetaDataStorageKey + name + el)
+      const searchReg = new RegExp(`^${MetaDataStorageKey}-${name}-`)
 
-          req.onerror = () => reject(req.error)
-          req.onsuccess = () => resolve(req.result)
-        }))),
-        Promise.all(cache.map((el) => caches.delete(MetaDataStorageKey + name + el))),
-        Promise.all(opfs.map((el) => rootHandle.removeEntry(MetaDataStorageKey + name + el))),
+      await Promise.all([
+        Promise.all(
+          global.indexedDB.databases().then((databases) => databases.filter((database) => searchReg.test(database.name)).map((database) => global.indexedDB.deleteDatabase(database.name)))
+        ),
+        Promise.all(
+          global.caches.keys().then((caches) => caches.filter((cache) => searchReg.test(cache)).map((cache) => global.caches.delete(cache)))
+        ),
+        navigator.storage.getDirectory().then((root) => root.removeEntry(`${MetaDataStorageKey}-${name}`, { recursive: true })),
       ])
 
       delete entries[name]

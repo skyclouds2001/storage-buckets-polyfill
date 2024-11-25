@@ -3,9 +3,6 @@
     "name": "sample",
     "persisted": false,
     "quota": 0,
-    "expires": 0,
-    "indexdb": ["sample"],
-    "cache": ["sample"],
-    "opfs": ["sample"]
+    "expires": 0
   }
 }
