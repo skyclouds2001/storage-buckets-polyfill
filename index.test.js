@@ -382,10 +382,49 @@ try {
   const root = await storageBucket.getDirectory()
   expect(root.name).toBe('')
   expect(root.kind).toBe('directory')
+
   expect((await Array.fromAsync(root.keys())).length).toBe(0)
   expect((await Array.fromAsync(root.values())).length).toBe(0)
   expect((await Array.fromAsync(root.entries())).length).toBe(0)
-  expect((await Array.fromAsync(root[Symbol.asyncIterator])).length).toBe(0)
+
+  try {
+    await root.removeEntry('sample-directory')
+    throw 'Expected to throw'
+  } catch { }
+
+  try {
+    await root.removeEntry('sample-file')
+    throw 'Expected to throw'
+  } catch { }
+
+  const dir = await root.getDirectoryHandle('sample-directory', { create: true })
+  expect(dir.name).toBe('sample-directory')
+  expect(dir.kind).toBe('directory')
+  const file = await root.getFileHandle('sample-file', { create: true })
+  expect(file.name).toBe('sample-file')
+  expect(file.kind).toBe('file')
+
+  expect((await Array.fromAsync(root.keys())).length).toBe(2)
+  expect((await Array.fromAsync(root.values())).length).toBe(2)
+  expect((await Array.fromAsync(root.entries())).length).toBe(2)
+
+  expect(await root.isSameEntry(root)).toBe(true)
+  expect(await root.isSameEntry(dir)).toBe(false)
+  expect(await root.isSameEntry(file)).toBe(false)
+  expect(await root.isSameEntry(await storageBucket.getDirectory())).toBe(true)
+  expect(await root.isSameEntry(await navigator.storage.getDirectory())).toBe(false)
+
+  expect((await root.resolve(dir)).length).toBe(1)
+  expect((await root.resolve(file)).length).toBe(1)
+  expect((await root.resolve(dir)).at(0)).toBe('sample-directory')
+  expect((await root.resolve(file)).at(0)).toBe('sample-file')
+
+  await root.removeEntry('sample-directory')
+  await root.removeEntry('sample-file')
+
+  expect((await Array.fromAsync(root.keys())).length).toBe(0)
+  expect((await Array.fromAsync(root.values())).length).toBe(0)
+  expect((await Array.fromAsync(root.entries())).length).toBe(0)
 
   /**
    * clean up Origin Private File System after File System feature test
