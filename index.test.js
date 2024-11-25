@@ -212,7 +212,7 @@ try {
     expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket.prototype, key).configurable).toBe(true)
   }
 
-  for (const key of ['getDirectory']) {
+  for (const key of ['getDirectory', 'expires', 'setExpires']) {
     /**
      * StorageBucket's function members must be defined, writable, enumerable and configurable
      */
@@ -497,6 +497,21 @@ try {
     await navigator.storageBuckets.open('abcdefg', { expires: Date.now() + 2000 })
     await new Promise((resolve) => setTimeout(resolve, 2000))
     expect((await navigator.storageBuckets.keys()).includes('abcdefg')).toBe(true)
+  }
+
+  {
+    const timestamp = Date.now() + 10000
+    const storageBucket = await navigator.storageBuckets.open('abcdefg')
+    expect(await storageBucket.expires()).toBe(null)
+    await storageBucket.setExpires(timestamp)
+    expect(await storageBucket.expires()).toBe(timestamp)
+    await storageBucket.setExpires(timestamp + 10000)
+    expect(await storageBucket.expires()).toBe(timestamp + 10000)
+
+    try {
+      await storageBucket.setExpires()
+      throw 'Expected to throw'
+    } catch { }
   }
 
   result.textContent = 'Test Succeeded!'

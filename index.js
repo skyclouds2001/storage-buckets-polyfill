@@ -51,7 +51,7 @@
       name,
       persisted: options.persisted ?? false,
       quota: options.quota ?? Number.POSITIVE_INFINITY,
-      expires: options.expires ?? Number.POSITIVE_INFINITY,
+      expires: options.expires ?? null,
       indexdb: [],
       cache: [],
       opfs: [],
@@ -199,7 +199,7 @@
       }
 
       const entries = await $readEntries()
-      const keys = Object.values(entries).filter((entry) => entry.expires < global.performance.timeOrigin + global.performance.now()).map((entry) => entry.name)
+      const keys = Object.values(entries).filter((entry) => entry.expires == null || entry.expires > global.performance.timeOrigin + global.performance.now()).map((entry) => entry.name)
       return keys
     } catch (error) {
       if (error instanceof DOMException && error.name === 'NotFoundError') {
@@ -303,7 +303,7 @@
     this[$$name] = name
     this[$$persistence] = options.persisted ?? false
     this[$$quota] = options.quota ?? Number.POSITIVE_INFINITY
-    this[$$expiration] = options.expires ?? Number.POSITIVE_INFINITY
+    this[$$expiration] = options.expires ?? null
   }
 
   Object.defineProperty($StorageBucket, 'name', {
@@ -437,6 +437,62 @@
     configurable: true,
     enumerable: true,
     value: $getDirectory,
+    writable: true,
+  })
+
+  const $setExpires = function (expires) {
+    if (Object.getPrototypeOf(this) !== $StorageBucket.prototype) {
+      throw new TypeError('Failed to execute \'setExpires\' on \'StorageBucket\': Illegal invocation')
+    }
+
+    if (arguments.length === 0) {
+      throw new TypeError('Failed to execute \'setExpires\' on \'StorageBucket\': 1 argument required, but only 0 present.')
+    }
+
+    if (this[$$removed]) {
+      throw new DOMException('Unknown error occurred while setting expires.', 'InvalidStateError')
+    }
+
+    this[$$expiration] = expires
+  }
+
+  Object.defineProperty($setExpires, 'name', {
+    configurable: true,
+    enumerable: false,
+    value: 'setExpires',
+    writable: false,
+  })
+
+  Object.defineProperty($StorageBucket.prototype, 'setExpires', {
+    configurable: true,
+    enumerable: true,
+    value: $setExpires,
+    writable: true,
+  })
+
+  const $expires = function () {
+    if (Object.getPrototypeOf(this) !== $StorageBucket.prototype) {
+      throw new TypeError('Failed to execute \'getDirectory\' on \'StorageBucket\': Illegal invocation')
+    }
+
+    if (this[$$removed]) {
+      throw new DOMException('Unknown error occurred while getting expires.', 'InvalidStateError')
+    }
+
+    return this[$$expiration]
+  }
+
+  Object.defineProperty($expires, 'name', {
+    configurable: true,
+    enumerable: false,
+    value: 'expires',
+    writable: false,
+  })
+
+  Object.defineProperty($StorageBucket.prototype, 'expires', {
+    configurable: true,
+    enumerable: true,
+    value: $expires,
     writable: true,
   })
 
