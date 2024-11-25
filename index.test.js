@@ -440,6 +440,34 @@ try {
    */
   await navigator.storageBuckets.delete('sample')
 
+  /**
+   * should throw with invalid storage bucket
+   */
+  try {
+    await navigator.storageBuckets.open('ABCDEFG')
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await navigator.storageBuckets.open('我')
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await navigator.storageBuckets.open('')
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await navigator.storageBuckets.open('sample5-sample5-sample5-sample5-sample5-sample5-sample5-sample5-')
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await navigator.storageBuckets.open('-abcdefg')
+    throw 'Expected to throw'
+  } catch { }
+  try {
+    await navigator.storageBuckets.open('_abcdefg')
+    throw 'Expected to throw'
+  } catch { }
+
   result.textContent = 'Test Succeeded!'
 
   console.log('Test Succeeded!')

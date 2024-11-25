@@ -25,6 +25,24 @@
 
   const MetaDataStorageKey = 'storage-buckets-polyfill'
 
+  /**
+   * @param {string} name
+   */
+  const $validateStorageBucketName = (name) => {
+    return Array.from(name)
+      .every(
+        (_, i) =>
+          name.charCodeAt(i) >= 48 && name.charCodeAt(i) <= 57 ||
+          name.charCodeAt(i) >= 97 && name.charCodeAt(i) <= 122 ||
+          name.charCodeAt(i) === 45 ||
+          name.charCodeAt(i) === 95
+      ) &&
+      name.length > 0 &&
+      name.length < 64 &&
+      !name.startsWith('-') &&
+      !name.startsWith('_')
+  }
+
   const $createEntry = ({
     name,
     options = {},
@@ -95,6 +113,10 @@
 
       if (arguments.length === 0) {
         throw new TypeError('Failed to execute \'open\' on \'StorageBucketManager\': 1 argument required, but only 0 present.')
+      }
+
+      if (!$validateStorageBucketName(name)) {
+        throw new TypeError(`The bucket name '${name}' is not a valid name.`)
       }
 
       const entries = await $readEntries()
@@ -182,6 +204,10 @@
 
       if (arguments.length === 0) {
         throw new TypeError('Failed to execute \'delete\' on \'StorageBucketManager\': 1 argument required, but only 0 present.')
+      }
+
+      if (!$validateStorageBucketName(name)) {
+        throw new TypeError(`The bucket name '${name}' is not a valid name.`)
       }
 
       const indexedDB = global.indexedDB
