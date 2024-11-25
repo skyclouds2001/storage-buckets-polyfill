@@ -108,9 +108,9 @@
         const entries = {}
         entries[name] = $createEntry({
           name,
-        }),
+        })
 
-          await $writeEntries(entries)
+        await $writeEntries(entries)
       } else {
         throw error
       }
