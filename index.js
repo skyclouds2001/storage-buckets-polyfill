@@ -150,7 +150,7 @@
         await $writeEntries(entries)
       } else {
         if (entries[name].expires != null && entries[name].expires <= global.performance.timeOrigin + global.performance.now()) {
-          await $delete(name)
+          await global.navigator.storageBuckets.delete(name)
           entries[name] = $createEntry({
             name,
             options,
