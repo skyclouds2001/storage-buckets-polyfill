@@ -124,7 +124,7 @@
       }
 
       if (options != null) {
-        if (options.expires != null && options.expires <= global.performance.timeOrigin + performance.now()) {
+        if (options.expires != null && options.expires <= global.performance.timeOrigin + global.performance.now()) {
           throw new TypeError('The bucket expiration is invalid.')
         }
 
@@ -148,6 +148,15 @@
           options,
         })
         await $writeEntries(entries)
+      } else {
+        if (entries[name].expires != null && entries[name].expires <= global.performance.timeOrigin + global.performance.now()) {
+          await $delete(name)
+          entries[name] = $createEntry({
+            name,
+            options,
+          })
+          await $writeEntries(entries)
+        }
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === 'NotFoundError') {
@@ -156,7 +165,6 @@
           name,
           options,
         })
-
         await $writeEntries(entries)
       } else {
         throw error
@@ -191,7 +199,7 @@
       }
 
       const entries = await $readEntries()
-      const keys = Object.keys(entries)
+      const keys = Object.values(entries).filter((entry) => entry.expires < global.performance.timeOrigin + global.performance.now()).map((entry) => entry.name)
       return keys
     } catch (error) {
       if (error instanceof DOMException && error.name === 'NotFoundError') {

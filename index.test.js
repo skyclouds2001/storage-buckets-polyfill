@@ -493,6 +493,12 @@ try {
     throw 'Expected not to throw'
   }
 
+  {
+    await navigator.storageBuckets.open('abcdefg', { expires: Date.now() + 2000 })
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    expect((await navigator.storageBuckets.keys()).includes('abcdefg')).toBe(true)
+  }
+
   result.textContent = 'Test Succeeded!'
 
   console.log('Test Succeeded!')
