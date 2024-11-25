@@ -27,12 +27,13 @@
 
   const $createEntry = ({
     name,
+    options = {},
   }) => {
     return {
       name,
-      // persisted: false,
-      // quota: 0,
-      // expires: 0,
+      persisted: options.persisted ?? false,
+      quota: options.quota ?? Number.POSITIVE_INFINITY,
+      expires: options.expires ?? Number.POSITIVE_INFINITY,
       indexdb: [],
       cache: [],
       // opfs: [],
@@ -86,7 +87,7 @@
   })
 
   /** @type {StorageBucketManager['open']} */
-  const $open = async function (name) {
+  const $open = async function (name, options) {
     try {
       if (Object.getPrototypeOf(this) !== $StorageBucketManager.prototype) {
         throw new TypeError('Failed to execute \'open\' on \'StorageBucketManager\': Illegal invocation')
@@ -100,6 +101,7 @@
       if (entries[name] == null) {
         entries[name] = $createEntry({
           name,
+          options,
         })
         await $writeEntries(entries)
       }
@@ -108,6 +110,7 @@
         const entries = {}
         entries[name] = $createEntry({
           name,
+          options,
         })
 
         await $writeEntries(entries)
@@ -117,7 +120,7 @@
     }
 
     allowConstruct = true
-    const storageBucket = new $StorageBucket(name)
+    const storageBucket = new $StorageBucket(name, options)
     allowConstruct = false
     return storageBucket
   }
@@ -224,14 +227,20 @@
   })
 
   const $$name = Symbol()
+  const $$persistence = Symbol()
+  const $$quota = Symbol()
+  const $$expiration = Symbol()
 
   /** @type {StorageBucket} */
-  const $StorageBucket = function StorageBucket(name) {
+  const $StorageBucket = function StorageBucket(name, options = {}) {
     if (!allowConstruct) {
       throw new TypeError('Illegal constructor')
     }
 
     this[$$name] = name
+    this[$$persistence] = options.persisted ?? false
+    this[$$quota] = options.quota ?? Number.POSITIVE_INFINITY
+    this[$$expiration] = options.expires ?? Number.POSITIVE_INFINITY
   }
 
   Object.defineProperty($StorageBucket, 'name', {
