@@ -212,7 +212,7 @@ try {
     expect(Object.getOwnPropertyDescriptor(globalThis.StorageBucket.prototype, key).configurable).toBe(true)
   }
 
-  for (const key of []) {
+  for (const key of ['getDirectory']) {
     /**
      * StorageBucket's function members must be defined, writable, enumerable and configurable
      */
@@ -363,6 +363,37 @@ try {
       req.onerror = () => reject(req.error)
       req.onsuccess = () => resolve(req.result)
     })
+  }
+
+  const rootHandle = await navigator.storage.getDirectory()
+
+  /**
+   * clean up Origin Private File System before File System feature test
+   */
+  for await (const [name] of rootHandle) {
+    if (name !== 'storage-buckets-polyfill') {
+      await rootHandle.removeEntry(name, { recursive: true })
+    }
+  }
+
+  /**
+   * StorageBucket must support manage Origin Private File System
+   */
+  const root = await storageBucket.getDirectory()
+  expect(root.name).toBe('')
+  expect(root.kind).toBe('directory')
+  expect((await Array.fromAsync(root.keys())).length).toBe(0)
+  expect((await Array.fromAsync(root.values())).length).toBe(0)
+  expect((await Array.fromAsync(root.entries())).length).toBe(0)
+  expect((await Array.fromAsync(root[Symbol.asyncIterator])).length).toBe(0)
+
+  /**
+   * clean up Origin Private File System after File System feature test
+   */
+  for await (const [name] of rootHandle) {
+    if (name !== 'storage-buckets-polyfill') {
+      await rootHandle.removeEntry(name, { recursive: true })
+    }
   }
 
   /**
