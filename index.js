@@ -196,8 +196,8 @@
 
       const { indexdb, cache, opfs } = entry
       await Promise.all([
-        Promise.all(indexdb.map(new Promise((resolve, reject) => {
-          const req = indexedDB.deleteDatabase(database.name)
+        Promise.all(indexdb.map((el) => new Promise((resolve, reject) => {
+          const req = indexedDB.deleteDatabase(MetaDataStorageKey + name + el)
 
           req.onerror = () => reject(req.error)
           req.onsuccess = () => resolve(req.result)
