@@ -354,14 +354,14 @@
     Object.defineProperty(storageBucketHandle, 'name', {
       configurable: true,
       enumerable: true,
-      get: '',
+      get: () => '',
       set: undefined,
     })
 
     Object.defineProperty(storageBucketHandle, 'kind', {
       configurable: true,
       enumerable: true,
-      get: 'directory',
+      get: () => 'directory',
       set: undefined,
     })
 
