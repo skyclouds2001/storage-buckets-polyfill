@@ -570,11 +570,11 @@
     writable: true,
   })
 
-  if (isInWindow) {
-    allowConstruct = true
-    const $storageBuckets = new $StorageBucketManager()
-    allowConstruct = false
+  allowConstruct = true
+  const $storageBuckets = new $StorageBucketManager()
+  allowConstruct = false
 
+  if (isInWindow) {
     Object.defineProperty(Navigator.prototype, 'storageBuckets', {
       configurable: true,
       enumerable: true,
@@ -588,10 +588,6 @@
     })
   }
   if (isInWorker) {
-    allowConstruct = true
-    const $storageBuckets = new $StorageBucketManager()
-    allowConstruct = false
-
     Object.defineProperty(WorkerNavigator.prototype, 'storageBuckets', {
       configurable: true,
       enumerable: true,
