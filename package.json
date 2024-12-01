@@ -1,0 +1,60 @@
+{
+  "name": "storage-buckets-polyfill",
+  "version": "1.0.0",
+  "description": "The polyfill of the Storage Buckets API",
+  "keywords": [
+    "Storage Buckets API",
+    "polyfill"
+  ],
+  "files": ["index.d.ts", "index.js"],
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "browser": "./index.js",
+  "unpkg": "./index.js",
+  "jsdelivr": "./index.js",
+  "types": "./index.d.ts",
+  "typings": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.js",
+      "browser": "./index.js",
+      "types": "./index.d.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skyclouds2001/storage-buckets-polyfill.git"
+  },
+  "homepage": "https://github.com/skyclouds2001/storage-buckets-polyfill#readme",
+  "bugs": {
+    "url": "https://github.com/skyclouds2001/storage-buckets-polyfill/issues",
+    "email": "skyclouds2001@163.com"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "skyclouds2001",
+    "email": "skyclouds2001@163.com",
+    "url": "https://skyclouds2001.github.io"
+  },
+  "contributors": [
+    "skyclouds2001"
+  ],
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/skyclouds2001"
+  },
+  "packageManager": "pnpm@9.12.1",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0",
+    "yarn": ">=1.22.0",
+    "pnpm": ">=8.11.0"
+  }
+}
